@@ -74,8 +74,11 @@ final class GenesisPresentation {
         charge.addListener(new AnimatorListenerAdapter(){boolean cancelled;@Override public void onAnimationCancel(Animator a){cancelled=true;}@Override public void onAnimationEnd(Animator a){if(cancelled||closing)return;introducing=false;ritual.setRunning(false);ritual.setVisibility(View.GONE);resultScroll.setVisibility(View.VISIBLE);entrance(multi);}});track(charge);
     }
     void preview(int rarity){
+        new AlertDialog.Builder(activity).setTitle("Choose race family").setItems(EmblemRevealView.FAMILIES,(d,index)->previewExample(rarity,index)).show();
+    }
+    private void previewExample(int rarity,int family){
         try{
-            JSONObject c=new JSONObject();c.put("customName","Effect preview");c.put("race","Human");c.put("baseRace","Human");c.put("class","Preview");c.put("rarity",new JSONObject().put("name",RARITIES[rarity]));
+            JSONObject c=new JSONObject();c.put("customName","Effect preview");c.put("race",EmblemRevealView.EXAMPLES[family]);c.put("baseRace",EmblemRevealView.EXAMPLES[family]);c.put("raceCategory",EmblemRevealView.FAMILIES[family]);c.put("class","Preview");c.put("rarity",new JSONObject().put("name",RARITIES[rarity]));
             summonInternal(Collections.singletonList(c),true);
         }catch(JSONException ignored){}
     }
@@ -90,7 +93,7 @@ final class GenesisPresentation {
         for(int i=0;i<results.size();i++){
             if(!multi||i%2==0){row=new LinearLayout(activity);row.setOrientation(LinearLayout.HORIZONTAL);content.addView(row);}
             RevealCard card=new RevealCard(results.get(i),i+1,multi);
-            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(multi?280:390),1);lp.setMargins(dp(3),dp(4),dp(3),dp(4));
+            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(multi?320:470),1);lp.setMargins(dp(3),dp(4),dp(3),dp(4));
             row.addView(card,lp);cards.add(card);
         }
         if(multi){
@@ -106,6 +109,7 @@ final class GenesisPresentation {
     }
     private void next(){
         if(closing||!playing)return;
+        for(RevealCard c:cards)if(c.flipping){handler.postDelayed(this::next,150);return;}
         for(RevealCard c:cards)if(!c.revealed&&!c.flipping){
             c.requestRectangleOnScreen(new Rect(0,0,c.getWidth(),c.getHeight()),false);
             c.reveal(()->handler.postDelayed(this::next,200));return;
@@ -129,7 +133,8 @@ final class GenesisPresentation {
         final JSONObject character;
         final int rarity;
         final LinearLayout back,front;
-        final Sigil effect;
+        final EmblemRevealView emblem;
+        final View badge;
         boolean revealed,flipping;
         RevealCard(JSONObject c,int number,boolean compact){
             super(activity);character=c;rarity=tier(c);setCameraDistance(dp(8000));
@@ -138,20 +143,19 @@ final class GenesisPresentation {
             assets.add(back,"media/branding/genesis-mark.png",compact?120:190);
             label(back,"GENESIS",18,0xffd6ad62);label(back,"Character "+number+" · Tap to reveal",12,0xffc4b69a);
             front=column();front.setGravity(Gravity.CENTER);front.setVisibility(View.GONE);addView(front,new FrameLayout.LayoutParams(-1,-1));
-            assets.add(front,"media/rarities/"+slug(RARITIES[rarity])+".png",compact?55:85);
-            String race=c.optString("baseRace",c.optString("race","Unknown"));
-            assets.add(front,"media/races/"+slug(race)+".png",compact?90:150);
+            assets.add(front,"media/rarities/"+slug(RARITIES[rarity])+".png",compact?55:85);badge=front.getChildAt(0);
+            emblem=new EmblemRevealView(activity,c,rarity,assets,compact?150:240);front.addView(emblem,new LinearLayout.LayoutParams(-1,dp(compact?150:240)));
             label(front,name(c),compact?13:20,0xfff5ead8);
             label(front,c.optString("race")+" · "+c.optString("class"),12,0xffc6b9cf);
             label(front,"CP "+c.optInt("combatPower")+" · "+RARITIES[rarity],12,COLORS[rarity]);
-            effect=new Sigil(rarity,"summon");addView(effect,new FrameLayout.LayoutParams(-1,-1));effect.setVisibility(View.GONE);
             setContentDescription("Unrevealed character "+number);setFocusable(true);setOnClickListener(v->reveal(null));
         }
-        void finish(){flipping=false;revealed=true;setAlpha(1);setTranslationY(0);setScaleX(1);setScaleY(1);setRotationY(0);back.setVisibility(View.GONE);front.setVisibility(View.VISIBLE);effect.setVisibility(View.GONE);for(int i=0;i<front.getChildCount();i++)front.getChildAt(i).setAlpha(1);setContentDescription(name(character)+", "+RARITIES[rarity]+", "+character.optString("race")+", CP "+character.optInt("combatPower"));}
+        void finish(){flipping=false;revealed=true;setAlpha(1);setTranslationY(0);setScaleX(1);setScaleY(1);setRotationY(0);back.setVisibility(View.GONE);front.setVisibility(View.VISIBLE);emblem.settle();badge.setScaleX(1);badge.setScaleY(1);for(int i=0;i<front.getChildCount();i++)front.getChildAt(i).setAlpha(1);setContentDescription(name(character)+", "+RARITIES[rarity]+", "+character.optString("race")+", CP "+character.optInt("combatPower"));}
         void reveal(Runnable done){
             if(closing||introducing||revealed||flipping)return;
             if(reduced()){finish();updateCount();if(done!=null)done.run();return;}
-            flipping=true;audio.play("flip");
+            for(RevealCard other:cards)if(other!=this&&other.flipping)return;
+            flipping=true;emblem.frame(0);badge.setAlpha(0);audio.play("flip");
             ValueAnimator flip=ValueAnimator.ofFloat(0,1);flip.setDuration(480);final boolean[] turned={false};
             flip.addUpdateListener(a->{float t=(float)a.getAnimatedValue();if(t>=.5f&&!turned[0]){turned[0]=true;back.setVisibility(View.GONE);front.setVisibility(View.VISIBLE);}setRotationY(t<.5f?t*180:(t-1)*180);float lift=(float)Math.sin(Math.PI*t);setTranslationY(-dp(9)*lift);setScaleX(1+.035f*lift);setScaleY(1+.035f*lift);});
             flip.addListener(new AnimatorListenerAdapter(){boolean cancelled;@Override public void onAnimationCancel(Animator a){cancelled=true;}@Override public void onAnimationEnd(Animator a){
@@ -160,10 +164,17 @@ final class GenesisPresentation {
                 setContentDescription(name(character)+", "+RARITIES[rarity]+", "+character.optString("race")+", CP "+character.optInt("combatPower"));
                 GradientDrawable revealedBorder=new GradientDrawable(GradientDrawable.Orientation.TL_BR,new int[]{0xff2c2135,0xff17131c});revealedBorder.setCornerRadius(dp(14));revealedBorder.setStroke(dp(1),COLORS[rarity]);setBackground(revealedBorder);
                 for(int index=2;index<front.getChildCount();index++){View text=front.getChildAt(index);ObjectAnimator fade=ObjectAnimator.ofFloat(text,"alpha",0,1);fade.setStartDelay((index-2)*85L);fade.setDuration(320);track(fade);}
-                audio.play("rarity-"+(rarity+1));effect.setVisibility(View.VISIBLE);
-                animateSigil(effect,750+rarity*140,()->{flipping=false;if(done!=null)done.run();});
+                audio.play("rarity-"+(rarity+1));
+                ValueAnimator badgeIn=ValueAnimator.ofFloat(0,1);badgeIn.setDuration(550);badgeIn.addUpdateListener(a->{float t=(float)a.getAnimatedValue();badge.setAlpha(Math.min(1,t*2));float size=.82f+.18f*t+.055f*(float)Math.sin(Math.PI*t);badge.setScaleX(size);badge.setScaleY(size);});track(badgeIn);
+                animateEmblem(emblem,1250+rarity*110,()->{badge.setAlpha(1);badge.setScaleX(1);badge.setScaleY(1);flipping=false;if(done!=null)done.run();});
             }});track(flip);
         }
+    }
+    private void animateEmblem(EmblemRevealView emblem,long duration,Runnable done){
+        if(reduced()){emblem.settle();if(done!=null)done.run();return;}
+        ValueAnimator a=ValueAnimator.ofFloat(0,1);a.setDuration(duration);a.setInterpolator(new LinearInterpolator());
+        a.addUpdateListener(v->emblem.frame((float)v.getAnimatedValue()));
+        a.addListener(new AnimatorListenerAdapter(){boolean cancelled;@Override public void onAnimationCancel(Animator v){cancelled=true;}@Override public void onAnimationEnd(Animator v){emblem.settle();if(!cancelled&&!closing&&done!=null)done.run();}});track(a);
     }
     private void animateSigil(Sigil v,long duration,Runnable done){
         if(reduced()){v.setVisibility(View.GONE);if(done!=null)done.run();return;}
@@ -176,8 +187,7 @@ final class GenesisPresentation {
         String title=kind.equals("train")?"Training complete":kind.equals("upgrade")?"Upgrade complete":"Evolution complete";
         FrameLayout frame=new FrameLayout(activity);content.addView(frame,new LinearLayout.LayoutParams(-1,dp(230)));
         SanctumRitualView backdrop=new SanctumRitualView(activity,prefs);frame.addView(backdrop,new FrameLayout.LayoutParams(-1,-1));
-        LinearLayout picture=column();frame.addView(picture,new FrameLayout.LayoutParams(-1,-1));
-        assets.add(picture,"media/races/"+slug(after.optString("baseRace",after.optString("race","Unknown")))+".png",200);
+        EmblemRevealView picture=new EmblemRevealView(activity,after,tier(after),assets,230);frame.addView(picture,new FrameLayout.LayoutParams(-1,-1));
         Sigil effect=new Sigil(tier(after),kind);frame.addView(effect,new FrameLayout.LayoutParams(-1,-1));
         label(content,name(after),23,0xfff5ead8);
         if(kind.equals("train"))label(content,"Level "+object(before,"progression").optInt("level",1)+" → "+object(after,"progression").optInt("level",1),18,0xff83d5b5);
@@ -193,7 +203,7 @@ final class GenesisPresentation {
         label(content,"CP "+before.optInt("combatPower")+" → "+after.optInt("combatPower"),16,0xffd6ad62);
         label(content,"Saved to your account.",13,0xffbda98c);
         action(content,"Skip animation",()->{cancelAnimations();effect.setVisibility(View.GONE);audio.stopEffects();});
-        show(content,title);audio.play(kind);animateSigil(effect,kind.equals("evolution")?2300:1250,null);
+        show(content,title);audio.play(kind);animateEmblem(picture,kind.equals("evolution")?2300:1250,null);animateSigil(effect,kind.equals("evolution")?2300:1250,null);
     }
 
     /** Ten geometric signatures, plus three progression motions. No bitmap allocation per frame. */
