@@ -20,6 +20,7 @@ final class GenesisAudio {
     private final Handler handler=new Handler(Looper.getMainLooper());
     private MediaPlayer music;
     private boolean foreground,focused,prepared,closed;
+    private boolean scene;
     private final AudioAttributes attributes=new AudioAttributes.Builder()
         .setUsage(AudioAttributes.USAGE_GAME).setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build();
     private final AudioFocusRequest focus;
@@ -33,7 +34,7 @@ final class GenesisAudio {
             },handler).build();
         pool=new SoundPool.Builder().setMaxStreams(4).setAudioAttributes(attributes).build();
         pool.setOnLoadCompleteListener((s,id,status)->{if(status==0)loaded.add(id);});
-        String[] names={"rarity-1","rarity-2","rarity-3","rarity-4","rarity-5","rarity-6","rarity-7","rarity-8","rarity-9","rarity-10","flip","train","upgrade","evolution"};
+        String[] names={"rarity-1","rarity-2","rarity-3","rarity-4","rarity-5","rarity-6","rarity-7","rarity-8","rarity-9","rarity-10","ritual-rise","flip","train","upgrade","evolution"};
         for(String name:names)try(AssetFileDescriptor fd=c.getAssets().openFd("audio/"+name+".wav")){
             sounds.put(name,pool.load(fd,1));
         }catch(Exception ignored){/* Missing audio must never block gameplay. */}
@@ -45,6 +46,7 @@ final class GenesisAudio {
             music.prepareAsync();
         }catch(Exception ignored){if(music!=null)music.release();music=null;}
     }
+    void setScene(boolean on){scene=on;sync();}
     void resume(){if(closed)return;foreground=true;settingsChanged();}
     void pause(){foreground=false;pauseMusic();stopEffects();if(focused)manager.abandonAudioFocusRequest(focus);focused=false;}
     void settingsChanged(){
@@ -60,7 +62,7 @@ final class GenesisAudio {
         if(music==null||!prepared||closed)return;
         if(foreground&&focused&&prefs.getBoolean("music",true)){
             float v=Math.max(0,Math.min(100,prefs.getInt("musicVolume",35)))/100f;
-            music.setVolume(v,v);if(!music.isPlaying())music.start();
+            v*=scene?.42f:1f;music.setVolume(v,v);if(!music.isPlaying())music.start();
         }else pauseMusic();
     }
     private void pauseMusic(){if(music!=null&&prepared&&music.isPlaying())music.pause();}

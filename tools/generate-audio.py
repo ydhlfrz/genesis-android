@@ -54,6 +54,12 @@ for tier,notes in enumerate(motifs,1):
 t=np.arange(int(.23*SR))/SR
 noise=rng.normal(0,.3,len(t));noise=np.convolve(noise,np.ones(9)/9,mode='same')
 save('flip',noise*np.sin(np.pi*t/.23)**2,.24)
+# Gentle ritual charge, with a soft tonal swell and filtered air.
+t=np.arange(round(1.65*SR))/SR
+noise=np.convolve(rng.normal(0,1,len(t)),np.ones(31)/31,mode='same')
+env=np.sin(np.pi*t/1.65)**2
+rise=(.17*noise+.18*np.sin(2*np.pi*(110*t+19*t*t))+.09*np.sin(2*np.pi*220*t))*env
+save('ritual-rise',rise,.38)
 for name,notes,voice in [('train',[62,65,69,74],0),('upgrade',[50,57,62,69,74],2),('evolution',[50,57,62,65,69,74,81],3)]:
     y=np.zeros(round((2.7 if name=='evolution' else 1.6)*SR))
     for i,n in enumerate(notes):add(y,tone(n,1.1,voice),i*(.17 if name=='evolution' else .10))

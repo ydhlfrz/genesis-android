@@ -24,7 +24,11 @@ final class GenesisPresentation {
     private final Handler handler=new Handler(Looper.getMainLooper());
     private final ArrayList<Animator> animations=new ArrayList<>();
     private final ArrayList<RevealCard> cards=new ArrayList<>();
-    private AlertDialog dialog;
+    private Dialog dialog;
+    private FrameLayout stage;
+    private ScrollView resultScroll;
+    private SanctumRitualView ritual;
+    private boolean introducing;
     private boolean closing,playing,foreground;
     private TextView counter;
     private Button playButton;
@@ -40,12 +44,34 @@ final class GenesisPresentation {
     private String name(JSONObject c){String s=c.optString("customName").trim();return s.isEmpty()?"UNNAMED HERO":s;}
     private int tier(JSONObject c){String rarity=object(c,"rarity").optString("name");for(int i=0;i<RARITIES.length;i++)if(RARITIES[i].equals(rarity))return i;return 0;}
     private void show(LinearLayout content,String title){
-        ScrollView scroll=new ScrollView(activity);scroll.setFillViewport(true);scroll.addView(content);
-        content.setBackgroundColor(0xff100b13);content.setPadding(dp(10),dp(12),dp(10),dp(12));
-        dialog=new AlertDialog.Builder(activity).setTitle(title).setView(scroll).setPositiveButton("Continue",null).create();
-        dialog.setOnDismissListener(d->{closing=true;cancelAnimations();audio.stopEffects();cards.clear();dialog=null;});
-        dialog.show();
-        if(dialog.getWindow()!=null)dialog.getWindow().setLayout(-1,-2);
+        LinearLayout shell=column();shell.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{0xff100d1c,0xff171019,0xff0c0a10}));
+        shell.setPadding(dp(12),dp(8),dp(12),dp(10));
+        shell.setOnApplyWindowInsetsListener((v,insets)->{v.setPadding(dp(12),insets.getSystemWindowInsetTop()+dp(8),dp(12),insets.getSystemWindowInsetBottom()+dp(10));return insets;});
+        label(shell,"G E N E S I S",13,0xffd6ad62);label(shell,title,23,0xfff5ead8);
+        stage=new FrameLayout(activity);shell.addView(stage,new LinearLayout.LayoutParams(-1,0,1));
+        resultScroll=new ScrollView(activity);resultScroll.setClipToPadding(false);resultScroll.addView(content);stage.addView(resultScroll,new FrameLayout.LayoutParams(-1,-1));
+        content.setPadding(dp(4),dp(12),dp(4),dp(12));
+        action(shell,"Skip animation · Show results",this::finishAll);
+        action(shell,"Continue",()->{if(dialog!=null)dialog.dismiss();});
+        dialog=new Dialog(activity,android.R.style.Theme_Material_NoActionBar);
+        dialog.setContentView(shell);dialog.setOnDismissListener(d->{closing=true;cancelAnimations();if(ritual!=null)ritual.setRunning(false);audio.stopEffects();audio.setScene(false);cards.clear();dialog=null;});
+        dialog.show();if(dialog.getWindow()!=null)dialog.getWindow().setLayout(-1,-1);shell.requestApplyInsets();audio.setScene(true);
+    }
+    private void entrance(boolean multi){
+        for(int i=0;i<cards.size();i++){
+            RevealCard card=cards.get(i);card.setAlpha(0);card.setTranslationY(dp(32));
+            AnimatorSet enter=new AnimatorSet();enter.playTogether(ObjectAnimator.ofFloat(card,"alpha",0,1),ObjectAnimator.ofFloat(card,"translationY",dp(32),0));
+            enter.setStartDelay(i*65L);enter.setDuration(380);enter.setInterpolator(new android.view.animation.DecelerateInterpolator());track(enter);
+        }
+        if(!multi&&!cards.isEmpty())handler.postDelayed(()->{if(!closing)cards.get(0).reveal(null);},420);
+        if(playButton!=null)playButton.setEnabled(true);
+    }
+    private void beginRitual(boolean multi){
+        introducing=true;resultScroll.setVisibility(View.INVISIBLE);if(playButton!=null)playButton.setEnabled(false);
+        ritual=new SanctumRitualView(activity,prefs);stage.addView(ritual,new FrameLayout.LayoutParams(-1,-1));ritual.setRunning(true);audio.play("ritual-rise");
+        ValueAnimator charge=ValueAnimator.ofFloat(0,1);charge.setDuration(1600);charge.setInterpolator(new android.view.animation.AccelerateDecelerateInterpolator());
+        charge.addUpdateListener(a->{float t=(float)a.getAnimatedValue();ritual.setCharge(t);ritual.setScaleX(1+t*.1f);ritual.setScaleY(1+t*.1f);ritual.setAlpha(t>.75f?(1-t)*4:1);});
+        charge.addListener(new AnimatorListenerAdapter(){boolean cancelled;@Override public void onAnimationCancel(Animator a){cancelled=true;}@Override public void onAnimationEnd(Animator a){if(cancelled||closing)return;introducing=false;ritual.setRunning(false);ritual.setVisibility(View.GONE);resultScroll.setVisibility(View.VISIBLE);entrance(multi);}});track(charge);
     }
     void preview(int rarity){
         try{
@@ -69,14 +95,14 @@ final class GenesisPresentation {
         }
         if(multi){
             playButton=action(content,"Play reveal sequence",()->{
-                if(playing)return;playing=true;playButton.setEnabled(false);next();
+                if(playing||introducing)return;playing=true;playButton.setEnabled(false);next();
             });
             action(content,"Reveal all · Skip animation",this::finishAll);
             label(content,"Tap any card to reveal it individually.",12,0xffbda98c);
         }else action(content,"Skip animation",this::finishAll);
         show(content,preview?"Rarity effect preview":multi?"Summon ×"+results.size():"Summon result");
         updateCount();
-        if(reduced())finishAll();else if(!multi&&!cards.isEmpty())cards.get(0).reveal(null);
+        if(reduced())finishAll();else beginRitual(multi);
     }
     private void next(){
         if(closing||!playing)return;
@@ -92,12 +118,12 @@ final class GenesisPresentation {
     private void track(Animator a){animations.add(a);a.addListener(new AnimatorListenerAdapter(){@Override public void onAnimationEnd(Animator x){animations.remove(x);}});a.start();}
     private void cancelAnimations(){handler.removeCallbacksAndMessages(null);for(Animator a:new ArrayList<>(animations))a.cancel();animations.clear();playing=false;}
     void finishAll(){
-        cancelAnimations();audio.stopEffects();
+        cancelAnimations();audio.stopEffects();introducing=false;if(ritual!=null){ritual.setRunning(false);ritual.setVisibility(View.GONE);}if(resultScroll!=null)resultScroll.setVisibility(View.VISIBLE);
         for(RevealCard c:cards)c.finish();updateCount();if(playButton!=null)playButton.setEnabled(false);
     }
     void resume(){foreground=true;}
     void pause(){foreground=false;finishAll();}
-    void close(){closing=true;cancelAnimations();audio.stopEffects();if(dialog!=null)dialog.dismiss();cards.clear();counter=null;playButton=null;}
+    void close(){closing=true;cancelAnimations();audio.stopEffects();if(dialog!=null)dialog.dismiss();if(ritual!=null)ritual.setRunning(false);audio.setScene(false);cards.clear();counter=null;playButton=null;ritual=null;stage=null;resultScroll=null;introducing=false;}
 
     private final class RevealCard extends FrameLayout {
         final JSONObject character;
@@ -107,7 +133,7 @@ final class GenesisPresentation {
         boolean revealed,flipping;
         RevealCard(JSONObject c,int number,boolean compact){
             super(activity);character=c;rarity=tier(c);setCameraDistance(dp(8000));
-            GradientDrawable border=new GradientDrawable();border.setColor(0xff201726);border.setCornerRadius(dp(14));border.setStroke(dp(1),0xff796644);setBackground(border);
+            GradientDrawable border=new GradientDrawable();border.setColor(0xff201726);border.setCornerRadius(dp(14));border.setStroke(dp(1),0xff796644);setBackground(border);setElevation(dp(5));
             back=column();back.setGravity(Gravity.CENTER);addView(back,new FrameLayout.LayoutParams(-1,-1));
             assets.add(back,"media/branding/genesis-mark.png",compact?120:190);
             label(back,"GENESIS",18,0xffd6ad62);label(back,"Character "+number+" · Tap to reveal",12,0xffc4b69a);
@@ -121,17 +147,19 @@ final class GenesisPresentation {
             effect=new Sigil(rarity,"summon");addView(effect,new FrameLayout.LayoutParams(-1,-1));effect.setVisibility(View.GONE);
             setContentDescription("Unrevealed character "+number);setFocusable(true);setOnClickListener(v->reveal(null));
         }
-        void finish(){flipping=false;revealed=true;setRotationY(0);back.setVisibility(View.GONE);front.setVisibility(View.VISIBLE);effect.setVisibility(View.GONE);setContentDescription(name(character)+", "+RARITIES[rarity]+", "+character.optString("race")+", CP "+character.optInt("combatPower"));}
+        void finish(){flipping=false;revealed=true;setAlpha(1);setTranslationY(0);setScaleX(1);setScaleY(1);setRotationY(0);back.setVisibility(View.GONE);front.setVisibility(View.VISIBLE);effect.setVisibility(View.GONE);for(int i=0;i<front.getChildCount();i++)front.getChildAt(i).setAlpha(1);setContentDescription(name(character)+", "+RARITIES[rarity]+", "+character.optString("race")+", CP "+character.optInt("combatPower"));}
         void reveal(Runnable done){
-            if(closing||revealed||flipping)return;
+            if(closing||introducing||revealed||flipping)return;
             if(reduced()){finish();updateCount();if(done!=null)done.run();return;}
             flipping=true;audio.play("flip");
             ValueAnimator flip=ValueAnimator.ofFloat(0,1);flip.setDuration(480);final boolean[] turned={false};
-            flip.addUpdateListener(a->{float t=(float)a.getAnimatedValue();if(t>=.5f&&!turned[0]){turned[0]=true;back.setVisibility(View.GONE);front.setVisibility(View.VISIBLE);}setRotationY(t<.5f?t*180:(t-1)*180);});
+            flip.addUpdateListener(a->{float t=(float)a.getAnimatedValue();if(t>=.5f&&!turned[0]){turned[0]=true;back.setVisibility(View.GONE);front.setVisibility(View.VISIBLE);}setRotationY(t<.5f?t*180:(t-1)*180);float lift=(float)Math.sin(Math.PI*t);setTranslationY(-dp(9)*lift);setScaleX(1+.035f*lift);setScaleY(1+.035f*lift);});
             flip.addListener(new AnimatorListenerAdapter(){boolean cancelled;@Override public void onAnimationCancel(Animator a){cancelled=true;}@Override public void onAnimationEnd(Animator a){
                 if(cancelled||closing)return;
-                setRotationY(0);revealed=true;updateCount();
+                setRotationY(0);setTranslationY(0);setScaleX(1);setScaleY(1);revealed=true;updateCount();
                 setContentDescription(name(character)+", "+RARITIES[rarity]+", "+character.optString("race")+", CP "+character.optInt("combatPower"));
+                GradientDrawable revealedBorder=new GradientDrawable(GradientDrawable.Orientation.TL_BR,new int[]{0xff2c2135,0xff17131c});revealedBorder.setCornerRadius(dp(14));revealedBorder.setStroke(dp(1),COLORS[rarity]);setBackground(revealedBorder);
+                for(int index=2;index<front.getChildCount();index++){View text=front.getChildAt(index);ObjectAnimator fade=ObjectAnimator.ofFloat(text,"alpha",0,1);fade.setStartDelay((index-2)*85L);fade.setDuration(320);track(fade);}
                 audio.play("rarity-"+(rarity+1));effect.setVisibility(View.VISIBLE);
                 animateSigil(effect,750+rarity*140,()->{flipping=false;if(done!=null)done.run();});
             }});track(flip);
@@ -147,6 +175,7 @@ final class GenesisPresentation {
         close();closing=false;LinearLayout content=column();
         String title=kind.equals("train")?"Training complete":kind.equals("upgrade")?"Upgrade complete":"Evolution complete";
         FrameLayout frame=new FrameLayout(activity);content.addView(frame,new LinearLayout.LayoutParams(-1,dp(230)));
+        SanctumRitualView backdrop=new SanctumRitualView(activity,prefs);frame.addView(backdrop,new FrameLayout.LayoutParams(-1,-1));
         LinearLayout picture=column();frame.addView(picture,new FrameLayout.LayoutParams(-1,-1));
         assets.add(picture,"media/races/"+slug(after.optString("baseRace",after.optString("race","Unknown")))+".png",200);
         Sigil effect=new Sigil(tier(after),kind);frame.addView(effect,new FrameLayout.LayoutParams(-1,-1));
