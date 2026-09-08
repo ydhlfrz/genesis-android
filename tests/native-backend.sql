@@ -1,5 +1,5 @@
 begin;
-insert into auth.users(id) values('10000000-0000-0000-0000-000000000001'),('10000000-0000-0000-0000-000000000002');
+insert into auth.users(id) values('10000000-0000-0000-0000-000000000001'),('20000000-0000-0000-0000-000000000002');
 set local role authenticated;
 select set_config('request.jwt.claim.sub','10000000-0000-0000-0000-000000000001',true);
 select public.genesis_profile_ensure('Native test');
@@ -42,7 +42,7 @@ do $$ declare r jsonb; id uuid;begin
  perform public.genesis_character_archive(id);
  assert (select archived from public.genesis_characters where registry_id=id);
 end; $$;
-select set_config('request.jwt.claim.sub','10000000-0000-0000-0000-000000000002',true);
+select set_config('request.jwt.claim.sub','20000000-0000-0000-0000-000000000002',true);
 select public.genesis_profile_ensure('Other account');
 do $$ begin assert (select count(*) from public.genesis_characters)=0, 'cross-account collection exposed';assert (select count(*) from public.genesis_wallets)=0, 'cross-account wallet exposed';end; $$;
 set local role anon;
