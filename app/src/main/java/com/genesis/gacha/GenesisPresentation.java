@@ -165,7 +165,7 @@ final class GenesisPresentation {
                 GradientDrawable revealedBorder=new GradientDrawable(GradientDrawable.Orientation.TL_BR,new int[]{0xff2c2135,0xff17131c});revealedBorder.setCornerRadius(dp(14));revealedBorder.setStroke(dp(1),COLORS[rarity]);setBackground(revealedBorder);
                 for(int index=2;index<front.getChildCount();index++){View text=front.getChildAt(index);ObjectAnimator fade=ObjectAnimator.ofFloat(text,"alpha",0,1);fade.setStartDelay((index-2)*85L);fade.setDuration(320);track(fade);}
                 audio.play("rarity-"+(rarity+1));
-                ValueAnimator badgeIn=ValueAnimator.ofFloat(0,1);badgeIn.setDuration(550);badgeIn.addUpdateListener(a->{float t=(float)a.getAnimatedValue();badge.setAlpha(Math.min(1,t*2));float size=.82f+.18f*t+.055f*(float)Math.sin(Math.PI*t);badge.setScaleX(size);badge.setScaleY(size);});track(badgeIn);
+                ValueAnimator badgeIn=ValueAnimator.ofFloat(0,1);badgeIn.setDuration(550);badgeIn.addUpdateListener(badgeAnimator->{float t=(float)badgeAnimator.getAnimatedValue();badge.setAlpha(Math.min(1,t*2));float size=.82f+.18f*t+.055f*(float)Math.sin(Math.PI*t);badge.setScaleX(size);badge.setScaleY(size);});track(badgeIn);
                 animateEmblem(emblem,1250+rarity*110,()->{badge.setAlpha(1);badge.setScaleX(1);badge.setScaleY(1);flipping=false;if(done!=null)done.run();});
             }});track(flip);
         }
