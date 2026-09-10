@@ -1,0 +1,1 @@
+See UPDATE-V17.md for the implemented rules and migration sequence. Internal rarity_stars remains a power band (1,3,5,7,9 for V2); displayStars is 3,4,5,6,7. Legacy seeds and fields retain their original meaning.

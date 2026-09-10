@@ -1,3 +1,6 @@
+const V2_POOLS={"Common": ["Beastkin", "Centaur", "Dark Elf", "Dragonkin", "Dryad", "Dwarf", "Elf", "Fairy", "Ghost", "Ghoul", "Golem", "Harpy", "Human", "Imp", "Leonin", "Lich", "Merfolk", "Minotaur", "Orc", "Reptilian", "Shadow", "Undead"], "Rare": ["Asgardian", "Beastkin", "Centaur", "Dark Elf", "Djinn", "Dragonkin", "Dryad", "Dwarf", "Elf", "Fairy", "Fallen Angel", "Ghost", "Ghoul", "Golem", "Harpy", "Human", "Imp", "Leonin", "Lich", "Merfolk", "Minotaur", "Oni", "Orc", "Pale Orc", "Reptilian", "Shadow", "Slime", "Spiritborn", "Undead", "Vampire", "Voidborn"], "Super Rare": ["Ancient Egyptian", "Asgardian", "Beastkin", "Celestial", "Centaur", "Dark Elf", "Demi-God", "Djinn", "Dragonkin", "Dryad", "Dwarf", "Elf", "Fairy", "Fallen Angel", "Ghost", "Ghoul", "Golem", "Harpy", "Human", "Imp", "Kitsune", "Krakenborn", "Leonin", "Lich", "Merfolk", "Minotaur", "Oni", "Orc", "Pale Orc", "Phoenixborn", "Reptilian", "Shadow", "Slime", "Spiritborn", "Undead", "Vampire", "Voidborn"], "Epic": ["Ancient Egyptian", "Angel", "Archangel", "Asgardian", "Celestial", "Demi-God", "Demon", "Fallen Angel", "God", "Kitsune", "Krakenborn", "Pale Orc", "Phoenixborn", "Slime", "Spiritborn", "Targaryen", "Vampire", "Voidborn"], "Mythic": ["Ancient Egyptian", "Angel", "Archangel", "Demon", "God", "Targaryen"], "Mythical": ["Ancient Egyptian", "Angel", "Archangel", "Demon", "God", "Targaryen"]};
+const V2_RARITIES=[{"name": "Common", "stars": 1, "displayStars": 3, "w": 60.0, "color": "#b8c3cc"}, {"name": "Rare", "stars": 3, "displayStars": 4, "w": 30.0, "color": "#66b9ee"}, {"name": "Super Rare", "stars": 5, "displayStars": 5, "w": 7.000000000000001, "color": "#918aff"}, {"name": "Epic", "stars": 7, "displayStars": 6, "w": 2.5, "color": "#c066f0"}, {"name": "Mythic", "stars": 9, "displayStars": 7, "w": 0.5, "color": "#ef91c6"}];
+function isV2(seed){return String(seed||"").indexOf("G165-")===0;}
 function GenesisSet(a){this.has=function(v){return a.indexOf(v)>=0;};}
 const DATA={
   races:[["Human",20],["Elf",6.7],["Orc",5.7],["Dwarf",5.2],["Beastkin",4.8],["Slime",4],["Pale Orc",3.5],["Reptilian",3.5],["Dark Elf",3],["Minotaur",3],["Centaur",3],["Leonin",3],["Imp",2.5],["Shadow",2.5],["Harpy",2.5],["Merfolk",2.5],["Fairy",2.2],["Spiritborn",2.2],["Ghoul",2.2],["Ghost",2.2],["Undead",2.2],["Dragonkin",2],["Vampire",1.8],["Ancient Egyptian",1.8],["Fallen Angel",1.5],["Lich",1.2],["Asgardian",1.2],["Celestial",1],["Voidborn",0.8],["Demon",0.8],["Angel",0.6],["Archangel",0.4],["Demi-God",0.3],["God",0.2],["Targaryen",0],["Dryad",1.8],["Golem",1.6],["Kitsune",1.2],["Krakenborn",1.0],["Djinn",0.9],["Oni",0.8],["Phoenixborn",0.4]],
@@ -245,7 +248,7 @@ function weaponEffectPool(category){
 }
 function generateWeaponProfile(weapon,seed){
   const wrng=mulberry32(hashSeed(seed+"|WEAPON"));
-  const rarity=weightedWith(wrng,WEAPON_RARITIES);
+  const rarity=weightedWith(wrng,isV2(seed)?V2_RARITIES:WEAPON_RARITIES);
   const category=weaponCategory(weapon);
   const base={1:120,2:180,3:260,4:360,5:480,6:620,7:800,8:1050,9:1400,10:1900}[rarity.stars];
   const spread={1:70,2:90,3:120,4:150,5:190,6:240,7:300,8:380,9:480,10:650}[rarity.stars];
@@ -263,7 +266,7 @@ function generateWeaponProfile(weapon,seed){
 }
 function generateEquipmentPiece(slot,seed){
   const erng=mulberry32(hashSeed(seed+"|EQUIP|"+slot.toUpperCase()));
-  const rarity=weightedWith(erng,EQUIPMENT_RARITIES);
+  const rarity=weightedWith(erng,isV2(seed)?V2_RARITIES:EQUIPMENT_RARITIES);
   const names=EQUIPMENT_POOLS[slot];
   const effects=EQUIPMENT_EFFECTS[slot];
   const name=names[Math.floor(erng()*names.length)];
@@ -408,6 +411,7 @@ function eligibleV155RacePool(rarityName){
   return pool;
 }
 function raceProbability(race,rarityName=null,seed=null){
+ if(isV2(seed)){const p=V2_POOLS[rarityName]||[];return p.indexOf(race)>=0?100/p.length:0;}
   if(!rarityName)return raceBaseWeight(race);
   if(!raceAllowedAtRarity(race,rarityName))return 0;
 
@@ -430,6 +434,7 @@ function raceProbability(race,rarityName=null,seed=null){
   return row[1]/total*remaining;
 }
 function pickRace(rarityName,seed){
+ if(isV2(seed)){const p=V2_POOLS[rarityName];if(!p)throw new Error("Unknown V2 rarity");return p[Math.floor(seedSubRng(seed,"RACE_V2")()*p.length)];}
   const gateRng=mulberry32(hashSeed(seed+"|RACE_GATE_V155"));
 
   if(/^G(?:155|161|163)-/.test(String(seed||""))){
@@ -445,27 +450,28 @@ function pickClass(){return rand(DATA.classes)}
 function pickOrigin(){return rand(DATA.origins)}
 function seedSubRng(seed,label){return mulberry32(hashSeed(`${seed}|${label}`))}
 function pickClassForSeed(seed){
-  if(String(seed||"").startsWith("G163-")){
+  if(String(seed||"").startsWith("G163-")||isV2(seed)){
     const r=seedSubRng(seed,"CLASS_V163");
     return DATA.classes[Math.floor(r()*DATA.classes.length)];
   }
   return pickClass();
 }
 function pickWeaponForSeed(seed){
-  if(String(seed||"").startsWith("G163-")){
+  if(String(seed||"").startsWith("G163-")||isV2(seed)){
     const r=seedSubRng(seed,"WEAPON_NAME_V163");
     return DATA.weapons[Math.floor(r()*DATA.weapons.length)];
   }
   return rand(DATA.weapons);
 }
 function pickTraitForSeed(seed,fallback){
-  if(String(seed||"").startsWith("G163-")){
+  if(String(seed||"").startsWith("G163-")||isV2(seed)){
     const r=seedSubRng(seed,"TRAIT_V163");
     return DATA.traits[Math.floor(r()*DATA.traits.length)];
   }
   return fallback;
 }
 function hiddenEvolutionV163(race,cls,rarity,seed){
+ if(isV2(seed))return {race,cls,hiddenRace:false,hiddenClass:false};
   if(!String(seed||"").startsWith("G163-"))return hiddenEvolution(race,cls,rarity);
   const c={Common:0,Uncommon:0,Rare:.003,"Special Rare":.008,"Super Rare":.015,"Super Special Rare":.025,Epic:.05,Legendary:.10,Mythical:.22,Primordial:.45}[rarity.name]||0;
   const hrng=seedSubRng(seed,"HIDDEN_V163");
@@ -670,7 +676,7 @@ function makeLore(c){
     Mythical:"Their very existence is spoken of as something close to myth.",
     Primordial:"They are regarded as an existence that transcends the boundaries of recorded history."
   };
-  return `${rand(origins)} ${rand(identity)} ${rarityLore[c.rarity.name]} The trait ${c.trait} is believed to play a decisive role in their destiny.`;
+  return `${rand(origins)} ${rand(identity)} ${rarityLore[c.rarity.name]||rarityLore.Mythical} The trait ${c.trait} is believed to play a decisive role in their destiny.`;
 }
 function comboTitle(c,fallback){
   const t=[
@@ -701,7 +707,8 @@ function generateCharacter(seedInput=makeSeed(),forcedRarityName=null){
   const oldRng=rng;
   rng=mulberry32(hashSeed(seed));
   try{
-    const forced=forcedRarityName?RARITIES.find(r=>r.name===forcedRarityName):null;
+    if(isV2(seed)&&!V2_RARITIES.some(r=>r.name===forcedRarityName))throw new Error("V2 server rarity required");
+    const forced=forcedRarityName?(isV2(seed)?V2_RARITIES:RARITIES).find(r=>r.name===forcedRarityName):null;
     const rarity=forced||rarityRoll(),baseRace=pickRace(rarity.name,seed),baseClass=pickClassForSeed(seed),syn=synergy(baseRace,baseClass,rarity),e=hiddenEvolutionV163(baseRace,baseClass,rarity,seed);
     let title=syn.title||(rarity.stars>=5?rand(["The Starforged","The Unbroken","The Silent Crown","The Dawnless One"]):rand(["Wandering Blade","Arcane Seeker","Iron Vanguard","Moonstrider","Ashborn"]));
     const c={customName:"",seed,characterId:characterIdFromSeed(seed),rarity,baseRace,baseClass,race:e.race,raceCategory:raceFamily(baseRace),class:e.cls,hiddenRace:e.hiddenRace,hiddenClass:e.hiddenClass,gender:rand(DATA.genders),age:ageForRace(baseRace),origin:pickOrigin(),subclass:rand(DATA.subclasses),faction:rand(DATA.factions),affinity:rand(DATA.affinities),ability:syn.ability,ultimate:rand(DATA.ultimates),passive:rand(DATA.passives),powerType:syn.power,magicType:syn.magic,weapon:pickWeaponForSeed(seed),trait:pickTraitForSeed(seed,syn.trait),personality:rand(DATA.personalities),alignment:rand(DATA.alignments)};
@@ -790,6 +797,7 @@ function buildPrompt(c){
 function serverCharacterFromRow(row,legacy=null){
   const c=generateCharacter(row.seed,row.rarity_name);
   ensureAdvancedData(c);
+  if(isV2(row.seed)){c.rulesVersion=2;c.legacy=false;}
   c.serverOwned=true;
   c.serverRegistryId=row.registry_id;
   c.serverSessionId=row.summon_session_id||null;
