@@ -81,6 +81,16 @@ public class CharacterEngineTest {
         }
     }
 
+    @Test public void v2InterpreterMatchesNodeFixtures() throws Exception {
+        CharacterEngine engine=loadEngine();
+        JSONArray fixtures=new JSONArray(readUtf8(getClass().getResourceAsStream("/v2-fixtures.json")));
+        assertEquals(25,fixtures.length());
+        for(int i=0;i<fixtures.length();i++){
+            JSONObject fixture=fixtures.getJSONObject(i);
+            assertJsonEqual("V2 fixture "+i,fixture.getJSONObject("character"),new JSONObject(engine.call("nativeReconstruct",fixture.getJSONObject("row").toString())));
+        }
+    }
+
     @Test public void catalogHasExpectedCoverage() throws Exception {
         CharacterEngine engine = loadEngine();
         JSONObject catalog = new JSONObject(engine.call("nativeCatalog", ""));

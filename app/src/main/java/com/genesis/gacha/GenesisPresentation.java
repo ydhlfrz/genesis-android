@@ -42,7 +42,7 @@ final class GenesisPresentation {
     private String slug(String s){return s.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]+","-").replaceAll("^-|-$","");}
     private static JSONObject object(JSONObject o,String key){JSONObject v=o==null?null:o.optJSONObject(key);return v==null?new JSONObject():v;}
     private String name(JSONObject c){String s=c.optString("customName").trim();return s.isEmpty()?"UNNAMED HERO":s;}
-    private int tier(JSONObject c){String rarity=object(c,"rarity").optString("name");for(int i=0;i<RARITIES.length;i++)if(RARITIES[i].equals(rarity))return i;return 0;}
+    private int tier(JSONObject c){String rarity=object(c,"rarity").optString("name");if(rarity.equals("Mythic"))return 8;for(int i=0;i<RARITIES.length;i++)if(RARITIES[i].equals(rarity))return i;return 0;}
     private void show(LinearLayout content,String title){
         LinearLayout shell=column();shell.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{0xff100d1c,0xff171019,0xff0c0a10}));
         shell.setPadding(dp(12),dp(8),dp(12),dp(10));
@@ -78,7 +78,7 @@ final class GenesisPresentation {
     }
     private void previewExample(int rarity,int family){
         try{
-            JSONObject c=new JSONObject();c.put("customName","Effect preview");c.put("race",EmblemRevealView.EXAMPLES[family]);c.put("baseRace",EmblemRevealView.EXAMPLES[family]);c.put("raceCategory",EmblemRevealView.FAMILIES[family]);c.put("class","Preview");c.put("rarity",new JSONObject().put("name",RARITIES[rarity]));
+            JSONObject c=new JSONObject();c.put("customName","Effect preview");c.put("race",EmblemRevealView.EXAMPLES[family]);c.put("baseRace",EmblemRevealView.EXAMPLES[family]);c.put("raceCategory",EmblemRevealView.FAMILIES[family]);c.put("class","Preview");c.put("legacy",false);c.put("rarity",new JSONObject().put("name",rarity==8?"Mythic":RARITIES[rarity]));
             summonInternal(Collections.singletonList(c),true);
         }catch(JSONException ignored){}
     }
@@ -143,14 +143,14 @@ final class GenesisPresentation {
             assets.add(back,"media/branding/genesis-mark.png",compact?120:190);
             label(back,"GENESIS",18,0xffd6ad62);label(back,"Character "+number+" · Tap to reveal",12,0xffc4b69a);
             front=column();front.setGravity(Gravity.CENTER);front.setVisibility(View.GONE);addView(front,new FrameLayout.LayoutParams(-1,-1));
-            assets.add(front,"media/rarities/"+slug(RARITIES[rarity])+".png",compact?55:85);badge=front.getChildAt(0);
+            assets.add(front,"media/rarities/"+(c.optBoolean("legacy",true)?"":"v2/")+slug(object(c,"rarity").optString("name",RARITIES[rarity]))+".png",compact?55:85);badge=front.getChildAt(0);
             emblem=new EmblemRevealView(activity,c,rarity,assets,compact?150:240);front.addView(emblem,new LinearLayout.LayoutParams(-1,dp(compact?150:240)));
             label(front,name(c),compact?13:20,0xfff5ead8);
             label(front,c.optString("race")+" · "+c.optString("class"),12,0xffc6b9cf);
-            label(front,"CP "+c.optInt("combatPower")+" · "+RARITIES[rarity],12,COLORS[rarity]);
+            label(front,"CP "+c.optInt("combatPower")+" · "+object(c,"rarity").optString("name",RARITIES[rarity]),12,COLORS[rarity]);
             setContentDescription("Unrevealed character "+number);setFocusable(true);setOnClickListener(v->reveal(null));
         }
-        void finish(){flipping=false;revealed=true;setAlpha(1);setTranslationY(0);setScaleX(1);setScaleY(1);setRotationY(0);back.setVisibility(View.GONE);front.setVisibility(View.VISIBLE);emblem.settle();badge.setScaleX(1);badge.setScaleY(1);for(int i=0;i<front.getChildCount();i++)front.getChildAt(i).setAlpha(1);setContentDescription(name(character)+", "+RARITIES[rarity]+", "+character.optString("race")+", CP "+character.optInt("combatPower"));}
+        void finish(){flipping=false;revealed=true;setAlpha(1);setTranslationY(0);setScaleX(1);setScaleY(1);setRotationY(0);back.setVisibility(View.GONE);front.setVisibility(View.VISIBLE);emblem.settle();badge.setScaleX(1);badge.setScaleY(1);for(int i=0;i<front.getChildCount();i++)front.getChildAt(i).setAlpha(1);setContentDescription(name(character)+", "+object(character,"rarity").optString("name",RARITIES[rarity])+", "+character.optString("race")+", CP "+character.optInt("combatPower"));}
         void reveal(Runnable done){
             if(closing||introducing||revealed||flipping)return;
             if(reduced()){finish();updateCount();if(done!=null)done.run();return;}
@@ -161,7 +161,7 @@ final class GenesisPresentation {
             flip.addListener(new AnimatorListenerAdapter(){boolean cancelled;@Override public void onAnimationCancel(Animator a){cancelled=true;}@Override public void onAnimationEnd(Animator a){
                 if(cancelled||closing)return;
                 setRotationY(0);setTranslationY(0);setScaleX(1);setScaleY(1);revealed=true;updateCount();
-                setContentDescription(name(character)+", "+RARITIES[rarity]+", "+character.optString("race")+", CP "+character.optInt("combatPower"));
+                setContentDescription(name(character)+", "+object(character,"rarity").optString("name",RARITIES[rarity])+", "+character.optString("race")+", CP "+character.optInt("combatPower"));
                 GradientDrawable revealedBorder=new GradientDrawable(GradientDrawable.Orientation.TL_BR,new int[]{0xff2c2135,0xff17131c});revealedBorder.setCornerRadius(dp(14));revealedBorder.setStroke(dp(1),COLORS[rarity]);setBackground(revealedBorder);
                 for(int index=2;index<front.getChildCount();index++){View text=front.getChildAt(index);ObjectAnimator fade=ObjectAnimator.ofFloat(text,"alpha",0,1);fade.setStartDelay((index-2)*85L);fade.setDuration(320);track(fade);}
                 audio.play("rarity-"+(rarity+1));
