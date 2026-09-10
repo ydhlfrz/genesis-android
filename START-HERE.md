@@ -1,3 +1,7 @@
+# Current release: V18.2 Living UI
+
+Read UPDATE-V18.2.md first. No new SQL is needed for a working V18.1 account.
+
 # Current release: V18.1 Lobby and embedded Sanctum
 
 Read UPDATE-V18.1.md first. Existing working V17.2/V18 databases need no new SQL.
