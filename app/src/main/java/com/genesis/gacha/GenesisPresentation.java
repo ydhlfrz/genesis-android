@@ -87,7 +87,7 @@ final class GenesisPresentation {
         close();closing=false;
         LinearLayout content=column();
         counter=label(content,"",14,0xffd6ad62);
-        label(content,preview?"Presentation preview · No character created.":"Characters are already saved to your Collection.",12,0xffbda98c);
+        label(content,preview?"Presentation preview · No character created.":"Choose Keep or Discard after closing this reveal.",12,0xffbda98c);
         boolean multi=results.size()>1;
         LinearLayout row=null;
         for(int i=0;i<results.size();i++){
