@@ -8,6 +8,7 @@ permissions:
   contents: read
 jobs:
   build:
+    needs: database-tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -36,6 +37,8 @@ jobs:
         run: |
           npm install --prefix tools --no-audit --no-fund
           node tools/transpile.cjs
+          node tools/validate-standard.cjs
+          node tests/engine-v2.cjs
       - uses: android-actions/setup-android@v3
       - uses: gradle/actions/setup-gradle@v4
         with:
@@ -80,3 +83,6 @@ jobs:
           psql -v ON_ERROR_STOP=1 -f tests/native-auth-fixture.sql
           psql -v ON_ERROR_STOP=1 -f backend/supabase-schema.sql -f backend/supabase-v16_1-migration.sql -f backend/supabase-v16_3a-migration.sql -f backend/supabase-v16_3b-migration.sql -f backend/supabase-v16_3c-migration.sql -f backend/supabase-v16_3c_1-hotfix.sql -f backend/supabase-v16_3d-migration.sql -f backend/supabase-v16_4-migration.sql -f backend/supabase-native-bootstrap-guard.sql
           psql -v ON_ERROR_STOP=1 -f tests/native-backend.sql
+          psql -v ON_ERROR_STOP=1 -f backend/supabase-v17-migration.sql
+          psql -v ON_ERROR_STOP=1 -f backend/supabase-v17-migration.sql
+          psql -v ON_ERROR_STOP=1 -f tests/v2-backend.sql
