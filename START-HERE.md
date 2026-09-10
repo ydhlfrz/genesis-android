@@ -1,3 +1,7 @@
+# Current release: V18.1 Lobby and embedded Sanctum
+
+Read UPDATE-V18.1.md first. Existing working V17.2/V18 databases need no new SQL.
+
 # Current release: V18 Landscape RPG UI
 
 For an existing working V17.2 account, read UPDATE-V18.md first. This UI update needs no new production SQL.
