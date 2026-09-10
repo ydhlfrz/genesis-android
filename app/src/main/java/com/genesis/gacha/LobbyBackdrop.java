@@ -4,7 +4,11 @@ import android.graphics.*;
 import android.graphics.drawable.Drawable;
 
 /** Original native fantasy hall illustration; intentionally quiet behind the controls. */
-final class LobbyBackdrop extends Drawable {
+final class LobbyBackdrop extends Drawable implements Runnable {
+ private boolean moving;
+ void start(boolean enabled){stop();moving=enabled;invalidateSelf();if(moving)scheduleSelf(this,android.os.SystemClock.uptimeMillis()+50);}
+ void stop(){moving=false;unscheduleSelf(this);}
+ @Override public void run(){if(!moving||getCallback()==null)return;invalidateSelf();scheduleSelf(this,android.os.SystemClock.uptimeMillis()+50);}
  private final Paint p=new Paint(Paint.ANTI_ALIAS_FLAG);
  private final Path path=new Path();
  private void rect(Canvas c,float x,float y,float w,float h,int color){p.setShader(null);p.setColor(color);c.drawRect(x,y,x+w,y+h,p);}
@@ -26,6 +30,9 @@ final class LobbyBackdrop extends Drawable {
    float torch=side==0?276:726;p.setShader(new RadialGradient(torch,238,58,new int[]{0x66e7ae55,0x00965b25},null,Shader.TileMode.CLAMP));canvas.drawCircle(torch,238,58,p);p.setShader(null);rect(canvas,torch-3,240,6,31,0xff665236);p.setColor(0xffc39850);canvas.drawOval(torch-5,219,torch+5,245,p);
   }
   path.reset();path.moveTo(236,90);path.quadTo(500,-95,764,90);path.lineTo(764,0);path.lineTo(236,0);path.close();p.setColor(0xff313c3e);canvas.drawPath(path,p);p.setStyle(Paint.Style.STROKE);p.setColor(0xff716548);p.setStrokeWidth(4);path.reset();path.moveTo(248,87);path.quadTo(500,-81,752,87);canvas.drawPath(path,p);p.setStyle(Paint.Style.FILL);
+  float time=moving?android.os.SystemClock.uptimeMillis()/1000f:0;
+  for(int i=0;i<22;i++){float x=260+(i*83%470)+(float)Math.sin(time*.35+i)*12,y=310-((time*11+i*23)%230);p.setColor(0xffe4c77b);p.setAlpha((int)(45+35*Math.sin(time+i)));canvas.drawCircle(x,y,1.5f,p);}p.setAlpha(255);
+  p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(2);p.setColor(0xff91b49b);p.setAlpha((int)(65+25*Math.sin(time*1.3)));canvas.drawOval(340,355,670,429,p);p.setAlpha(255);p.setStyle(Paint.Style.FILL);
   // Readability vignette.
   p.setShader(new RadialGradient(500,245,580,new int[]{0x0010181d,0xbb060b10},new float[]{.15f,1},Shader.TileMode.CLAMP));canvas.drawRect(0,0,1000,500,p);p.setShader(null);canvas.restore();
  }
