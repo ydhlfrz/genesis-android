@@ -1,3 +1,7 @@
+# Current release: V18 Landscape RPG UI
+
+For an existing working V17.2 account, read UPDATE-V18.md first. This UI update needs no new production SQL.
+
 # Pembaruan 17.0
 
 Untuk paket ini, ikuti **UPDATE-V17.md** terlebih dahulu. Langkah di bawah adalah dokumentasi fondasi versi sebelumnya.
