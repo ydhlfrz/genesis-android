@@ -82,19 +82,24 @@ final class GenesisPresentation {
             summonInternal(Collections.singletonList(c),true);
         }catch(JSONException ignored){}
     }
-    void summon(List<JSONObject> results){summonInternal(results,false);}
+    interface DecisionHandler {void decide(JSONObject character,boolean keep,java.util.function.Consumer<String> done);}
+    private DecisionHandler decisionHandler;
+    void summon(List<JSONObject> results,DecisionHandler handler){decisionHandler=handler;summonInternal(results,false);}
+    void summon(List<JSONObject> results){decisionHandler=null;summonInternal(results,false);}
     private void summonInternal(List<JSONObject> results,boolean preview){
         close();closing=false;
         LinearLayout content=column();
         counter=label(content,"",14,0xffd6ad62);
-        label(content,preview?"Presentation preview · No character created.":"Choose Keep or Discard after closing this reveal.",12,0xffbda98c);
+        label(content,preview?"Presentation preview · No character created.":"Reveal each character, then choose Keep or Discard here.",12,0xffbda98c);
         boolean multi=results.size()>1;
         LinearLayout row=null;
         for(int i=0;i<results.size();i++){
             if(!multi||i%2==0){row=new LinearLayout(activity);row.setOrientation(LinearLayout.HORIZONTAL);content.addView(row);}
             RevealCard card=new RevealCard(results.get(i),i+1,multi);
             LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(multi?320:470),1);lp.setMargins(dp(3),dp(4),dp(3),dp(4));
-            row.addView(card,lp);cards.add(card);
+            LinearLayout cell=column();row.addView(cell,new LinearLayout.LayoutParams(0,-2,1));
+            cell.addView(card,new LinearLayout.LayoutParams(-1,dp(multi?360:510)));cards.add(card);
+            if(!preview&&decisionHandler!=null)addDecisionControls(cell,card,decisionHandler);
         }
         if(multi){
             playButton=action(content,"Play reveal sequence",()->{
@@ -106,6 +111,22 @@ final class GenesisPresentation {
         show(content,preview?"Rarity effect preview":multi?"Summon ×"+results.size():"Summon result");
         updateCount();
         if(reduced())finishAll();else beginRitual(multi);
+    }
+    private void addDecisionControls(LinearLayout cell,RevealCard card,DecisionHandler handler){
+        TextView state=label(cell,"Reveal to choose",12,0xffc6b9cf);
+        Button keep=new Button(activity),discard=new Button(activity);keep.setText("Keep");discard.setText("Discard");
+        cell.addView(keep,new LinearLayout.LayoutParams(-1,-2));cell.addView(discard,new LinearLayout.LayoutParams(-1,-2));
+        java.util.function.Consumer<Boolean> save=choice->{
+            keep.setEnabled(false);discard.setEnabled(false);state.setText("Saving…");
+            handler.decide(card.character,choice,error->{
+                if(error==null){state.setText(choice?"Kept · In Collection":"Discarded");}
+                else{state.setText(error);keep.setEnabled(choice);discard.setEnabled(!choice);}
+            });
+        };
+        keep.setOnClickListener(v->{if(!card.revealed){card.reveal(null);return;}save.accept(true);});
+        discard.setOnClickListener(v->{if(!card.revealed){card.reveal(null);return;}
+            new AlertDialog.Builder(activity).setTitle("Discard this character?").setMessage(card.character.optString("race")+" · "+object(card.character,"rarity").optString("name")+"\nThis cannot be undone. History remains.").setNegativeButton("Cancel",null).setPositiveButton("Discard",(d,w)->save.accept(false)).show();
+        });
     }
     private void next(){
         if(closing||!playing)return;

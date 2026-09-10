@@ -91,3 +91,8 @@ jobs:
           psql -v ON_ERROR_STOP=1 -f backend/supabase-v17_1-selection.sql
           psql -v ON_ERROR_STOP=1 -f backend/supabase-v17_1-selection.sql
           psql -v ON_ERROR_STOP=1 -f tests/selection-backend.sql
+      - name: Verify protected bulk cleanup
+        run: |
+          psql -v ON_ERROR_STOP=1 -f backend/supabase-v17_2-cleanup.sql
+          psql -v ON_ERROR_STOP=1 -f backend/supabase-v17_2-cleanup.sql
+          psql -v ON_ERROR_STOP=1 -f tests/cleanup-backend.sql

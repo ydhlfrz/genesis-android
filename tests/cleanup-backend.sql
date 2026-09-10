@@ -1,0 +1,28 @@
+begin;
+insert into auth.users(id) values('70000000-0000-0000-0000-000000000001');
+set local role authenticated;
+select set_config('request.jwt.claim.sub','70000000-0000-0000-0000-000000000001',true);
+select public.genesis_profile_ensure('Cleanup test');
+select public.genesis_wallet_initialize(0,0);
+reset role;
+update public.genesis_wallets set gp=240 where user_id='70000000-0000-0000-0000-000000000001';
+set local role authenticated;
+do $$declare r jsonb;ids uuid[];id uuid;result jsonb;k text:=gen_random_uuid()::text;wallet jsonb;begin
+ r:=public.genesis_v2_summon(10,false,gen_random_uuid()::text);
+ select array_agg((value->>'registry_id')::uuid order by ord) into ids from jsonb_array_elements(r->'results') with ordinality a(value,ord);
+ foreach id in array ids loop perform public.genesis_character_decide(id,true);end loop;
+ perform public.genesis_character_set_favorite(ids[1],true);
+ perform public.genesis_character_set_name(ids[2],'Protected name');
+ begin perform public.genesis_bulk_discard_unnamed(ids,k);raise exception 'protected deletion allowed';exception when raise_exception then if sqlerrm<>'SELECTION_CHANGED_REFRESH_AND_REVIEW' then raise;end if;end;
+ assert (select count(*) from public.genesis_characters where not archived)=10,'invalid batch must be atomic';
+ wallet:=public.genesis_v2_status()->'wallet';
+ result:=public.genesis_bulk_discard_unnamed(ids[3:10],k);
+ assert (result->>'discarded')::int=8;
+ assert result=public.genesis_bulk_discard_unnamed(ids[3:10],k),'safe retry';
+ assert wallet=public.genesis_v2_status()->'wallet','cleanup cannot alter wallet';
+ assert (select count(*) from public.genesis_characters where not archived)=2;
+ assert (select favorite and not archived from public.genesis_characters where registry_id=ids[1]);
+ perform set_config('request.jwt.claim.sub','80000000-0000-0000-0000-000000000002',true);
+ begin perform public.genesis_bulk_discard_unnamed(ids[1:2],gen_random_uuid()::text);raise exception 'cross account allowed';exception when raise_exception then if sqlerrm<>'SELECTION_CHANGED_REFRESH_AND_REVIEW' then raise;end if;end;
+end;$$;
+rollback;
