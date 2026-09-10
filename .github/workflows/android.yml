@@ -86,3 +86,8 @@ jobs:
           psql -v ON_ERROR_STOP=1 -f backend/supabase-v17-migration.sql
           psql -v ON_ERROR_STOP=1 -f backend/supabase-v17-migration.sql
           psql -v ON_ERROR_STOP=1 -f tests/v2-backend.sql
+      - name: Verify character selection migration and access rules
+        run: |
+          psql -v ON_ERROR_STOP=1 -f backend/supabase-v17_1-selection.sql
+          psql -v ON_ERROR_STOP=1 -f backend/supabase-v17_1-selection.sql
+          psql -v ON_ERROR_STOP=1 -f tests/selection-backend.sql
