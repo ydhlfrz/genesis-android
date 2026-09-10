@@ -1,7 +1,13 @@
 <resources>
  <style name="AppTheme" parent="android:style/Theme.Material.NoActionBar">
-  <item name="android:fontFamily">sans</item><item name="android:colorAccent">#D4B477</item>
+  <item name="android:fontFamily">monospace</item><item name="android:colorAccent">#C69A55</item>
+  <item name="android:textColorPrimary">#EEE1C2</item><item name="android:textColorSecondary">#B8B39E</item>
   <item name="android:windowLightStatusBar">false</item><item name="android:windowActionModeOverlay">true</item>
-  <item name="android:windowBackground">#0B1020</item><item name="android:navigationBarColor">#0B1020</item>
+  <item name="android:windowBackground">#121919</item><item name="android:navigationBarColor">#121919</item><item name="android:statusBarColor">#121919</item>
+  <item name="android:alertDialogTheme">@style/GenesisDialog</item>
+ </style>
+ <style name="GenesisDialog" parent="android:style/Theme.Material.Dialog.Alert">
+  <item name="android:fontFamily">monospace</item><item name="android:colorAccent">#C69A55</item>
+  <item name="android:windowBackground">#1D2626</item><item name="android:textColorPrimary">#EEE1C2</item>
  </style>
 </resources>

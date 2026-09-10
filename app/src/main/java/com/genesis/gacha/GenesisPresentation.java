@@ -37,23 +37,24 @@ final class GenesisPresentation {
     private int dp(int n){return Math.round(n*activity.getResources().getDisplayMetrics().density);}
     private boolean reduced(){return !foreground||prefs.getBoolean("reduceMotion",false)||!ValueAnimator.areAnimatorsEnabled();}
     private LinearLayout column(){LinearLayout p=new LinearLayout(activity);p.setOrientation(LinearLayout.VERTICAL);return p;}
-    private TextView label(LinearLayout p,String text,int size,int color){TextView v=new TextView(activity);v.setText(text);v.setTextSize(size);v.setTextColor(color);v.setGravity(Gravity.CENTER);v.setPadding(dp(4),dp(6),dp(4),dp(6));p.addView(v);return v;}
-    private Button action(LinearLayout p,String title,Runnable r){Button b=new Button(activity);b.setText(title);b.setAllCaps(false);p.addView(b,new LinearLayout.LayoutParams(-1,-2));b.setOnClickListener(v->r.run());return b;}
+    private TextView label(LinearLayout p,String text,int size,int color){TextView v=new TextView(activity);PixelFrame.type(v);v.setText(text);v.setTextSize(size);v.setTextColor(color);v.setGravity(Gravity.CENTER);v.setPadding(dp(4),dp(3),dp(4),dp(3));p.addView(v);return v;}
+    private Button action(LinearLayout p,String title,Runnable r){Button b=new Button(activity);PixelFrame.type(b);b.setTextSize(12);b.setMinHeight(dp(48));b.setPadding(dp(8),dp(4),dp(8),dp(4));b.setBackground(PixelFrame.button(activity));b.setText(title);b.setAllCaps(false);p.addView(b,new LinearLayout.LayoutParams(-1,-2));b.setOnClickListener(v->r.run());return b;}
     private String slug(String s){return s.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]+","-").replaceAll("^-|-$","");}
     private static JSONObject object(JSONObject o,String key){JSONObject v=o==null?null:o.optJSONObject(key);return v==null?new JSONObject():v;}
     private String name(JSONObject c){String s=c.optString("customName").trim();return s.isEmpty()?"UNNAMED HERO":s;}
     private int tier(JSONObject c){String rarity=object(c,"rarity").optString("name");if(rarity.equals("Mythic"))return 8;for(int i=0;i<RARITIES.length;i++)if(RARITIES[i].equals(rarity))return i;return 0;}
     private void show(LinearLayout content,String title){
-        LinearLayout shell=column();shell.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{0xff100d1c,0xff171019,0xff0c0a10}));
+        LinearLayout shell=column();shell.setBackground(new PixelFrame(activity,PixelFrame.INK,PixelFrame.GOLD));
         shell.setPadding(dp(12),dp(8),dp(12),dp(10));
-        shell.setOnApplyWindowInsetsListener((v,insets)->{v.setPadding(dp(12),insets.getSystemWindowInsetTop()+dp(8),dp(12),insets.getSystemWindowInsetBottom()+dp(10));return insets;});
-        label(shell,"G E N E S I S",13,0xffd6ad62);label(shell,title,23,0xfff5ead8);
+        shell.setOnApplyWindowInsetsListener((v,insets)->{v.setPadding(insets.getSystemWindowInsetLeft()+dp(10),insets.getSystemWindowInsetTop()+dp(5),insets.getSystemWindowInsetRight()+dp(10),insets.getSystemWindowInsetBottom()+dp(5));return insets;});
+        label(shell,"GENESIS  /  "+title.toUpperCase(Locale.ROOT),17,PixelFrame.GOLD);
         stage=new FrameLayout(activity);shell.addView(stage,new LinearLayout.LayoutParams(-1,0,1));
         resultScroll=new ScrollView(activity);resultScroll.setClipToPadding(false);resultScroll.addView(content);stage.addView(resultScroll,new FrameLayout.LayoutParams(-1,-1));
-        content.setPadding(dp(4),dp(12),dp(4),dp(12));
-        action(shell,"Skip animation · Show results",this::finishAll);
-        action(shell,"Continue",()->{if(dialog!=null)dialog.dismiss();});
-        dialog=new Dialog(activity,android.R.style.Theme_Material_NoActionBar);
+        content.setPadding(dp(4),dp(2),dp(4),dp(2));
+        LinearLayout footer=new LinearLayout(activity);shell.addView(footer);
+        if(!cards.isEmpty()){Button reveal=action(footer,"Reveal all",this::finishAll);reveal.setLayoutParams(new LinearLayout.LayoutParams(0,dp(48),1));playButton=action(footer,"Play sequence",()->{if(playing||introducing)return;playing=true;next();});playButton.setLayoutParams(new LinearLayout.LayoutParams(0,dp(48),1));}
+        Button exit=action(footer,"Continue",()->{if(dialog!=null)dialog.dismiss();});exit.setLayoutParams(new LinearLayout.LayoutParams(0,dp(48),1));
+        dialog=new Dialog(activity,R.style.AppTheme);
         dialog.setContentView(shell);dialog.setOnDismissListener(d->{closing=true;cancelAnimations();if(ritual!=null)ritual.setRunning(false);audio.stopEffects();audio.setScene(false);cards.clear();dialog=null;});
         dialog.show();if(dialog.getWindow()!=null)dialog.getWindow().setLayout(-1,-1);shell.requestApplyInsets();audio.setScene(true);
     }
@@ -92,22 +93,14 @@ final class GenesisPresentation {
         counter=label(content,"",14,0xffd6ad62);
         label(content,preview?"Presentation preview · No character created.":"Reveal each character, then choose Keep or Discard here.",12,0xffbda98c);
         boolean multi=results.size()>1;
-        LinearLayout row=null;
+        HorizontalScrollView strip=new HorizontalScrollView(activity);strip.setFillViewport(true);content.addView(strip,new LinearLayout.LayoutParams(-1,-2));
+        LinearLayout row=new LinearLayout(activity);row.setGravity(Gravity.CENTER);strip.addView(row);
         for(int i=0;i<results.size();i++){
-            if(!multi||i%2==0){row=new LinearLayout(activity);row.setOrientation(LinearLayout.HORIZONTAL);content.addView(row);}
-            RevealCard card=new RevealCard(results.get(i),i+1,multi);
-            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,dp(multi?320:470),1);lp.setMargins(dp(3),dp(4),dp(3),dp(4));
-            LinearLayout cell=column();row.addView(cell,new LinearLayout.LayoutParams(0,-2,1));
-            cell.addView(card,new LinearLayout.LayoutParams(-1,dp(multi?360:510)));cards.add(card);
+            RevealCard card=new RevealCard(results.get(i),i+1,true);
+            LinearLayout cell=column();LinearLayout.LayoutParams cellParams=new LinearLayout.LayoutParams(dp(multi?220:320),-2);cellParams.setMargins(dp(4),dp(3),dp(4),dp(3));row.addView(cell,cellParams);
+            cell.addView(card,new LinearLayout.LayoutParams(-1,dp(218)));cards.add(card);
             if(!preview&&decisionHandler!=null)addDecisionControls(cell,card,decisionHandler);
         }
-        if(multi){
-            playButton=action(content,"Play reveal sequence",()->{
-                if(playing||introducing)return;playing=true;playButton.setEnabled(false);next();
-            });
-            action(content,"Reveal all · Skip animation",this::finishAll);
-            label(content,"Tap any card to reveal it individually.",12,0xffbda98c);
-        }else action(content,"Skip animation",this::finishAll);
         show(content,preview?"Rarity effect preview":multi?"Summon ×"+results.size():"Summon result");
         updateCount();
         if(reduced())finishAll();else beginRitual(multi);
@@ -115,7 +108,7 @@ final class GenesisPresentation {
     private void addDecisionControls(LinearLayout cell,RevealCard card,DecisionHandler handler){
         TextView state=label(cell,"Reveal to choose",12,0xffc6b9cf);
         Button keep=new Button(activity),discard=new Button(activity);keep.setText("Keep");discard.setText("Discard");
-        cell.addView(keep,new LinearLayout.LayoutParams(-1,-2));cell.addView(discard,new LinearLayout.LayoutParams(-1,-2));
+        LinearLayout choices=new LinearLayout(activity);cell.addView(choices);for(Button choice:new Button[]{keep,discard}){PixelFrame.type(choice);choice.setTextSize(12);choice.setAllCaps(false);choice.setPadding(dp(4),dp(3),dp(4),dp(3));choice.setBackground(PixelFrame.button(activity));choices.addView(choice,new LinearLayout.LayoutParams(0,dp(48),1));}
         java.util.function.Consumer<Boolean> save=choice->{
             keep.setEnabled(false);discard.setEnabled(false);state.setText("Saving…");
             handler.decide(card.character,choice,error->{
@@ -159,16 +152,16 @@ final class GenesisPresentation {
         boolean revealed,flipping;
         RevealCard(JSONObject c,int number,boolean compact){
             super(activity);character=c;rarity=tier(c);setCameraDistance(dp(8000));
-            GradientDrawable border=new GradientDrawable();border.setColor(0xff201726);border.setCornerRadius(dp(14));border.setStroke(dp(1),0xff796644);setBackground(border);setElevation(dp(5));
+            setBackground(new PixelFrame(activity,PixelFrame.PANEL,PixelFrame.GOLD));setPadding(dp(7),dp(7),dp(7),dp(7));
             back=column();back.setGravity(Gravity.CENTER);addView(back,new FrameLayout.LayoutParams(-1,-1));
-            assets.add(back,"media/branding/genesis-mark.png",compact?120:190);
+            assets.add(back,"media/branding/genesis-mark.png",compact?75:130);
             label(back,"GENESIS",18,0xffd6ad62);label(back,"Character "+number+" · Tap to reveal",12,0xffc4b69a);
             front=column();front.setGravity(Gravity.CENTER);front.setVisibility(View.GONE);addView(front,new FrameLayout.LayoutParams(-1,-1));
-            assets.add(front,"media/rarities/"+(c.optBoolean("legacy",true)?"":"v2/")+slug(object(c,"rarity").optString("name",RARITIES[rarity]))+".png",compact?55:85);badge=front.getChildAt(0);
-            emblem=new EmblemRevealView(activity,c,rarity,assets,compact?150:240);front.addView(emblem,new LinearLayout.LayoutParams(-1,dp(compact?150:240)));
-            label(front,name(c),compact?13:20,0xfff5ead8);
-            label(front,c.optString("race")+" · "+c.optString("class"),12,0xffc6b9cf);
-            label(front,"CP "+c.optInt("combatPower")+" · "+object(c,"rarity").optString("name",RARITIES[rarity]),12,COLORS[rarity]);
+            assets.add(front,"media/rarities/"+(c.optBoolean("legacy",true)?"":"v2/")+slug(object(c,"rarity").optString("name",RARITIES[rarity]))+".png",compact?34:65);badge=front.getChildAt(0);
+            emblem=new EmblemRevealView(activity,c,rarity,assets,compact?70:150);front.addView(emblem,new LinearLayout.LayoutParams(-1,dp(compact?70:150)));
+            label(front,name(c),compact?12:18,0xfff5ead8);
+            label(front,c.optString("race")+" · "+c.optString("class"),10,0xffc6b9cf);
+            label(front,"CP "+c.optInt("combatPower")+" · "+object(c,"rarity").optString("name",RARITIES[rarity]),10,COLORS[rarity]);
             setContentDescription("Unrevealed character "+number);setFocusable(true);setOnClickListener(v->reveal(null));
         }
         void finish(){flipping=false;revealed=true;setAlpha(1);setTranslationY(0);setScaleX(1);setScaleY(1);setRotationY(0);back.setVisibility(View.GONE);front.setVisibility(View.VISIBLE);emblem.settle();badge.setScaleX(1);badge.setScaleY(1);for(int i=0;i<front.getChildCount();i++)front.getChildAt(i).setAlpha(1);setContentDescription(name(character)+", "+object(character,"rarity").optString("name",RARITIES[rarity])+", "+character.optString("race")+", CP "+character.optInt("combatPower"));}
@@ -183,7 +176,7 @@ final class GenesisPresentation {
                 if(cancelled||closing)return;
                 setRotationY(0);setTranslationY(0);setScaleX(1);setScaleY(1);revealed=true;updateCount();
                 setContentDescription(name(character)+", "+object(character,"rarity").optString("name",RARITIES[rarity])+", "+character.optString("race")+", CP "+character.optInt("combatPower"));
-                GradientDrawable revealedBorder=new GradientDrawable(GradientDrawable.Orientation.TL_BR,new int[]{0xff2c2135,0xff17131c});revealedBorder.setCornerRadius(dp(14));revealedBorder.setStroke(dp(1),COLORS[rarity]);setBackground(revealedBorder);
+                setBackground(new PixelFrame(activity,PixelFrame.PANEL,COLORS[rarity]));
                 for(int index=2;index<front.getChildCount();index++){View text=front.getChildAt(index);ObjectAnimator fade=ObjectAnimator.ofFloat(text,"alpha",0,1);fade.setStartDelay((index-2)*85L);fade.setDuration(320);track(fade);}
                 audio.play("rarity-"+(rarity+1));
                 ValueAnimator badgeIn=ValueAnimator.ofFloat(0,1);badgeIn.setDuration(550);badgeIn.addUpdateListener(badgeAnimator->{float t=(float)badgeAnimator.getAnimatedValue();badge.setAlpha(Math.min(1,t*2));float size=.82f+.18f*t+.055f*(float)Math.sin(Math.PI*t);badge.setScaleX(size);badge.setScaleY(size);});track(badgeIn);
