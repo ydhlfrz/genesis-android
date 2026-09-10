@@ -102,6 +102,7 @@ begin
 
   perform private.genesis_v2_ensure(uid);
   select * into w from public.genesis_wallets where user_id=uid for update;
+  if not found then raise exception 'SECURE_ECONOMY_NOT_INITIALIZED'; end if;
   -- Recheck after the account lock: concurrent retries must return the same receipt.
   select r.response into existing from public.genesis_rpc_receipts r where user_id=uid and rpc_name='genesis_v2_summon' and request_key=p_request_key;
   if found then return existing;end if;
@@ -110,7 +111,6 @@ begin
     if w.tickets<p_count then raise exception 'INSUFFICIENT_TICKETS';end if;
     w.tickets:=w.tickets-p_count;cost:=0;
   end if;
-  if not found then raise exception 'SECURE_ECONOMY_NOT_INITIALIZED'; end if;
   if w.gp<cost then raise exception 'INSUFFICIENT_GP'; end if;
 
   insert into public.genesis_summon_sessions(id,user_id,request_key,summon_count,gp_cost,gp_earned)
