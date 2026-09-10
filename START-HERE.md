@@ -1,3 +1,7 @@
+# Pembaruan 17.0
+
+Untuk paket ini, ikuti **UPDATE-V17.md** terlebih dahulu. Langkah di bawah adalah dokumentasi fondasi versi sebelumnya.
+
 # Genesis V16.4.5 — Native Android port, first candidate
 
 Paket ini adalah source Android yang dibuat dari ZIP web V16.4.5 Anda. Ini belum merupakan APK yang telah lulus build atau diuji di HP. Workflow GitHub akan menjalankan pengujian engine, build, lint, dan SQL sebelum dipakai untuk pengujian perangkat.
