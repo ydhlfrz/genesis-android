@@ -11,9 +11,14 @@ final class RarityBadgeView extends View {
  private final Paint p=new Paint(Paint.ANTI_ALIAS_FLAG);
  private final Path path=new Path();
  private final int tier;
- RarityBadgeView(Context c,int tier){super(c);this.tier=Math.max(0,Math.min(4,tier));setContentDescription(NAMES[this.tier]+", "+(this.tier+3)+" stars");setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_YES);}
+ private static final Bitmap[] ART=new Bitmap[5];
+ private static final String[] KEYS={"common","rare","super-rare","epic","mythic"};
+ private Bitmap artwork;
+
+ RarityBadgeView(Context c,int tier){super(c);this.tier=Math.max(0,Math.min(4,tier));setContentDescription(NAMES[this.tier]+", "+(this.tier+3)+" stars");setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_YES);
+ synchronized(ART){artwork=ART[this.tier];if(artwork==null){try(java.io.InputStream in=c.getAssets().open("media/rarities/v2/"+KEYS[this.tier]+".png")){BitmapFactory.Options options=new BitmapFactory.Options();options.inSampleSize=4;artwork=BitmapFactory.decodeStream(in,null,options);ART[this.tier]=artwork;}catch(java.io.IOException ignored){/* Original vector badge remains the fallback. */}}}}
  private void star(Canvas c,float x,float y,float r){path.reset();for(int i=0;i<10;i++){double a=-Math.PI/2+i*Math.PI/5;float d=i%2==0?r:r*.45f;float xx=x+(float)Math.cos(a)*d,yy=y+(float)Math.sin(a)*d;if(i==0)path.moveTo(xx,yy);else path.lineTo(xx,yy);}path.close();p.setColor(0xffffe5a0);c.drawPath(path,p);}
- @Override protected void onDraw(Canvas c){super.onDraw(c);float scale=Math.min(getWidth()/360f,getHeight()/82f);c.save();c.translate((getWidth()-360*scale)/2,(getHeight()-82*scale)/2);c.scale(scale,scale);int color=COLORS[tier];
+ @Override protected void onDraw(Canvas c){super.onDraw(c);if(artwork!=null){float fit=Math.min((float)getWidth()/artwork.getWidth(),(float)getHeight()/artwork.getHeight());float w=artwork.getWidth()*fit,h=artwork.getHeight()*fit;p.setFilterBitmap(true);c.drawBitmap(artwork,null,new RectF((getWidth()-w)/2,(getHeight()-h)/2,(getWidth()+w)/2,(getHeight()+h)/2),p);return;}float scale=Math.min(getWidth()/360f,getHeight()/82f);c.save();c.translate((getWidth()-360*scale)/2,(getHeight()-82*scale)/2);c.scale(scale,scale);int color=COLORS[tier];
   p.setShader(new LinearGradient(0,0,0,82,new int[]{0xffe3e7dd,0xff515f65,0xff101c24,0xffb7bbae},null,Shader.TileMode.CLAMP));c.drawRoundRect(25,7,335,75,13,13,p);p.setShader(null);
   p.setColor(0xff121e28);c.drawRoundRect(31,13,329,69,9,9,p);
   p.setShader(new LinearGradient(0,14,0,70,new int[]{color,0xff202b39,0xff162331},new float[]{0,.4f,1},Shader.TileMode.CLAMP));c.drawRoundRect(35,16,325,66,7,7,p);p.setShader(null);
