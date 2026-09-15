@@ -1,0 +1,1010 @@
+[
+  {
+    "path": "media/branding/genesis-logo.png",
+    "before": 1654966,
+    "after": 468807,
+    "original_size": [
+      2172,
+      724
+    ],
+    "optimized_size": [
+      1080,
+      360
+    ],
+    "sha256": "0d0627219bc18ce8fe409f8e22365d7b0490b4a0a6c675a69e3831e61c8c1898"
+  },
+  {
+    "path": "media/branding/genesis-mark.png",
+    "before": 417614,
+    "after": 413788,
+    "original_size": [
+      512,
+      512
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "a411cde694f4e3ea16450f14e9aacc4d9194daebe67dcf76173a166e5b78852e"
+  },
+  {
+    "path": "media/races/ancient-egyptian.png",
+    "before": 688536,
+    "after": 458071,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "25cd080735dcaad4900e5b7388784d9f7b56cfce409dbd3a2fb06af87849af39"
+  },
+  {
+    "path": "media/races/angel.png",
+    "before": 587220,
+    "after": 410860,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "db38878c3d2036cca8a750c5432ae02c9594554fde670000f6eb4d920867f3c7"
+  },
+  {
+    "path": "media/races/archangel.png",
+    "before": 549505,
+    "after": 454288,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "f91cf9acbf57f2ed00819b35104497cb6655763b8635fa7a2f9ac203e73c7b97"
+  },
+  {
+    "path": "media/races/asgardian.png",
+    "before": 676276,
+    "after": 468312,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "08bb1042790da1d059cf80c59555b67fa65137fbaab1f92b92e7f55f76019097"
+  },
+  {
+    "path": "media/races/beastkin.png",
+    "before": 563294,
+    "after": 392556,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "206c64a805879e41cfb3dad1e58a8f9be9d974be0c8965bd6a46fa208812b78b"
+  },
+  {
+    "path": "media/races/celestial.png",
+    "before": 451867,
+    "after": 383861,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "06efc76c6b0c0404019cf2b1b7f7b2594343ff6089cb33f8def052980bf7ac20"
+  },
+  {
+    "path": "media/races/centaur.png",
+    "before": 601521,
+    "after": 422281,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "ebf3ff774baa16f5fa3548f658d4a7131e4dbbb99f82a2243df3b34a8aff5fc8"
+  },
+  {
+    "path": "media/races/dark-elf.png",
+    "before": 674327,
+    "after": 437170,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "a9091dfcb0e796bacb3f2b558c22620f8bf9722ebd1cbdb787ed8f784edd352a"
+  },
+  {
+    "path": "media/races/demi-god.png",
+    "before": 574940,
+    "after": 386028,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "f0d249c279d5285c52bacbf3961df37b5f0fe45f4a1a0aa710dc3ba55c1af262"
+  },
+  {
+    "path": "media/races/demon.png",
+    "before": 655064,
+    "after": 401496,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "eafbcdbfd38f0a26d2651f20f0546ebfeb1115522c20bb5db29cb7a40bc3ef22"
+  },
+  {
+    "path": "media/races/djinn.png",
+    "before": 495416,
+    "after": 369545,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "857cd8a28889dbbdaf8da89385288b7835b616a75b47ac52f547eb819f109a51"
+  },
+  {
+    "path": "media/races/dragonkin.png",
+    "before": 656703,
+    "after": 432806,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "b1946456b4f829d1569dd679f37f4af34948689ddafbaf9351fb41eac3ef5410"
+  },
+  {
+    "path": "media/races/dryad.png",
+    "before": 559672,
+    "after": 396507,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "0e137eb66f3ff807d9ba6002574685d2557a16a34def8e53c4cc81fcd74b8ca6"
+  },
+  {
+    "path": "media/races/dwarf.png",
+    "before": 679654,
+    "after": 449926,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "1ca0feecdb95218f648caf24621c68094d99a7b7e06288119bec6eabe2bbb6b5"
+  },
+  {
+    "path": "media/races/elf.png",
+    "before": 569450,
+    "after": 397914,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "3c2ec626adc3a3facaaaf9ce66d1bec19ac4ea015bfe140ad86afe9ababcd445"
+  },
+  {
+    "path": "media/races/fairy.png",
+    "before": 452307,
+    "after": 404614,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "d1849d62a9278bc4b37b92b770384afaa3d87c421a8408974bb4b11c6f60950b"
+  },
+  {
+    "path": "media/races/fallen-angel.png",
+    "before": 562773,
+    "after": 388252,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "1dbba7c5cc114a1b4077adb91f47d244c6722087a4b5cd18d4296d769b807490"
+  },
+  {
+    "path": "media/races/ghost.png",
+    "before": 572865,
+    "after": 415563,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "6f31c1f109638cf93e9faafcc339e5ec37b1fbdf8c44ac747f34e02ecfa9d313"
+  },
+  {
+    "path": "media/races/ghoul.png",
+    "before": 632475,
+    "after": 438080,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "04b8482d4e5579690ccc381434a49929ae63a17dd5a599a06fd8496909b8c316"
+  },
+  {
+    "path": "media/races/god.png",
+    "before": 600924,
+    "after": 407097,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "16161e0100b35cfc0df4a3c2c5a9f87097700ca9cb6c4fb6c79dd45a8f8d67e0"
+  },
+  {
+    "path": "media/races/golem.png",
+    "before": 594102,
+    "after": 401039,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "f6755df5460bdcd30d37701f2c7f60e90c7a5062a3f05d35ccf26ee7622ce98c"
+  },
+  {
+    "path": "media/races/harpy.png",
+    "before": 554617,
+    "after": 391665,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "e4715f9a24ec1604a90f54e073765bf608ccfdfbb2a8239966f50349f2ead001"
+  },
+  {
+    "path": "media/races/human.png",
+    "before": 559226,
+    "after": 398743,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "09b1fa5f354a7376fe577a23a68c7d4734790539e3893d6b11eb9fc0a9eb8366"
+  },
+  {
+    "path": "media/races/imp.png",
+    "before": 559772,
+    "after": 354745,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "1f08d03699d6e44a213b686bdd2b9293cd0ce7db62b951e0edd19ec62258d759"
+  },
+  {
+    "path": "media/races/kitsune.png",
+    "before": 494734,
+    "after": 372674,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "f0f9bd3e22ff2feda3df570aa5984fb67d15ff3deff7c837eacb68d80efb7e99"
+  },
+  {
+    "path": "media/races/krakenborn.png",
+    "before": 597201,
+    "after": 423656,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "924867fdd791c1c7bdd1763bbca1820cf618ed3e0d94357c22b7abc6f038478f"
+  },
+  {
+    "path": "media/races/leonin.png",
+    "before": 599514,
+    "after": 397975,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "0395ef70c5bd07bdccff645c71ea9521f208269c6d56a2b41f0f1635b9328a26"
+  },
+  {
+    "path": "media/races/lich.png",
+    "before": 589189,
+    "after": 422108,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "58daacad94dc9582c24943647701f57eb2492ac138001203c38913b2714e5132"
+  },
+  {
+    "path": "media/races/merfolk.png",
+    "before": 548069,
+    "after": 410736,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "f264387ddef33460d4b6e7fa2fc637823e220f309d3fd9ab8ceb5f6522c380dc"
+  },
+  {
+    "path": "media/races/minotaur.png",
+    "before": 710421,
+    "after": 453428,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "e871514f93614b81a17f4c6f2360f09c8b67c06cb6ae037f53d403879b9a4415"
+  },
+  {
+    "path": "media/races/oni.png",
+    "before": 567653,
+    "after": 196673,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "2059a7e7fa52433e1f50aaf6dc1f0d5f8633196a8b92771b1af0dd369258443f"
+  },
+  {
+    "path": "media/races/orc.png",
+    "before": 644349,
+    "after": 422227,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "224de29d8afc02fc250e58b1c26e043534b764b522620cc868d57faa234df36a"
+  },
+  {
+    "path": "media/races/pale-orc.png",
+    "before": 657313,
+    "after": 424286,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "99ef669dded095ade1033678182fe308369d772f9e466eac598dae82ffe65179"
+  },
+  {
+    "path": "media/races/phoenixborn.png",
+    "before": 598979,
+    "after": 406682,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "b7eff4e6f086e540bac90440a22135a0acc117d3997da68c524a31dac0d27e34"
+  },
+  {
+    "path": "media/races/reptilian.png",
+    "before": 623017,
+    "after": 436288,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "a5bc8627c946a63aac8e37a857361861b6933143032fa8c163ac038c9df43dc4"
+  },
+  {
+    "path": "media/races/shadow.png",
+    "before": 636806,
+    "after": 432197,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "7b2ba3734f06fee1bf1939609f33fdbc429dd86cb59cc2c6d96727b7fe9e85ed"
+  },
+  {
+    "path": "media/races/slime.png",
+    "before": 490183,
+    "after": 373784,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "c5d3c8ac2dab6e6809dccff6a9e230261a9c4f14f05327da6f69570186219494"
+  },
+  {
+    "path": "media/races/spiritborn.png",
+    "before": 530774,
+    "after": 393794,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "202bc1fa502a8399cc099c7b5e4c423671016baa927b7f16ec294f76a28abb46"
+  },
+  {
+    "path": "media/races/targaryen.png",
+    "before": 567567,
+    "after": 384813,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "86a5539da0a52492d901dc8e421a9f6d16d2b36ed745f52bf97937b1f0d66cd8"
+  },
+  {
+    "path": "media/races/undead.png",
+    "before": 643210,
+    "after": 436955,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "273518023a67a8f21850cc785b8d84718703d44483467723f2dfcbd51531f296"
+  },
+  {
+    "path": "media/races/unknown.png",
+    "before": 565326,
+    "after": 404209,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "c9049cc21e1ab4a700a835c5ba05c9313da39f5d0e8abb319addd59238bc56e3"
+  },
+  {
+    "path": "media/races/vampire.png",
+    "before": 514092,
+    "after": 344887,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "86b79d4e02744c4e874aa867343269b92c26d19bd4da44d1baef0bb37cda1f9a"
+  },
+  {
+    "path": "media/races/voidborn.png",
+    "before": 561273,
+    "after": 407676,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      512,
+      512
+    ],
+    "sha256": "aa78a2fe37104932873f4705281b3e1a5fea7828cf69b1c3c041c5beb48c0aef"
+  },
+  {
+    "path": "media/rarities/common.png",
+    "before": 473765,
+    "after": 473765,
+    "original_size": [
+      640,
+      640
+    ],
+    "optimized_size": [
+      640,
+      640
+    ],
+    "sha256": "ef607eef11e5effbf2d2bcc0b25cd910eec09dec7da91fd53df93d8c841323c7"
+  },
+  {
+    "path": "media/rarities/epic.png",
+    "before": 643115,
+    "after": 643115,
+    "original_size": [
+      640,
+      640
+    ],
+    "optimized_size": [
+      640,
+      640
+    ],
+    "sha256": "963f135964cd36778d488af72f779ee76eff0ce508d840a3a97de593b7d0806c"
+  },
+  {
+    "path": "media/rarities/legendary.png",
+    "before": 654802,
+    "after": 654802,
+    "original_size": [
+      640,
+      640
+    ],
+    "optimized_size": [
+      640,
+      640
+    ],
+    "sha256": "8fd817eb3861b9b554872815c8eb6943047903bd4fa7e95998b602978a1a198f"
+  },
+  {
+    "path": "media/rarities/mythical.png",
+    "before": 609068,
+    "after": 609068,
+    "original_size": [
+      640,
+      640
+    ],
+    "optimized_size": [
+      640,
+      640
+    ],
+    "sha256": "404bae20ff54824217d7c62d4c8ce6fdc3ee34bc2cafef2f475da1cb8b924b4e"
+  },
+  {
+    "path": "media/rarities/primordial.png",
+    "before": 663374,
+    "after": 663374,
+    "original_size": [
+      640,
+      640
+    ],
+    "optimized_size": [
+      640,
+      640
+    ],
+    "sha256": "c415a4cc273c7beb8327632afa274dbb763992b148503afdb73242657fa10ebd"
+  },
+  {
+    "path": "media/rarities/rare.png",
+    "before": 471387,
+    "after": 471387,
+    "original_size": [
+      640,
+      640
+    ],
+    "optimized_size": [
+      640,
+      640
+    ],
+    "sha256": "eef4cc930e40280b556da75ac22ee0d95ef32f21c8a0e7017c5027e3e32b8c2a"
+  },
+  {
+    "path": "media/rarities/special-rare.png",
+    "before": 568265,
+    "after": 568265,
+    "original_size": [
+      640,
+      640
+    ],
+    "optimized_size": [
+      640,
+      640
+    ],
+    "sha256": "4c719106f858b3500af318dde7c4d7c5b714fa87b4f172f4a3f80a9b03e3333c"
+  },
+  {
+    "path": "media/rarities/super-rare.png",
+    "before": 657198,
+    "after": 657198,
+    "original_size": [
+      640,
+      640
+    ],
+    "optimized_size": [
+      640,
+      640
+    ],
+    "sha256": "95e60fac34a081364c6990db974a5b581868c1ea8f4436403e7d4b27c99df103"
+  },
+  {
+    "path": "media/rarities/super-special-rare.png",
+    "before": 652858,
+    "after": 652858,
+    "original_size": [
+      640,
+      640
+    ],
+    "optimized_size": [
+      640,
+      640
+    ],
+    "sha256": "646a051b354af88e2415597df20d6bcf2673e4feacf99acfb75b801a52139ba4"
+  },
+  {
+    "path": "media/rarities/uncommon.png",
+    "before": 464234,
+    "after": 464234,
+    "original_size": [
+      640,
+      640
+    ],
+    "optimized_size": [
+      640,
+      640
+    ],
+    "sha256": "aa2c000cc92a85740ab167e4e0577369901b6d2c43f5dd473f6438173b2620c7"
+  },
+  {
+    "path": "media/rarities/v2/common.png",
+    "before": 1561392,
+    "after": 414487,
+    "original_size": [
+      2172,
+      724
+    ],
+    "optimized_size": [
+      1080,
+      360
+    ],
+    "sha256": "60bb1d26ea8564cdfe84f192dd45b98147ddcdd684b1302c440996622e65286d"
+  },
+  {
+    "path": "media/rarities/v2/epic.png",
+    "before": 1975218,
+    "after": 527554,
+    "original_size": [
+      2172,
+      724
+    ],
+    "optimized_size": [
+      1080,
+      360
+    ],
+    "sha256": "327291917b33c879f4ab427a39cc3b60750fae4ca66df43adbe33924854a90e6"
+  },
+  {
+    "path": "media/rarities/v2/mythic.png",
+    "before": 1957040,
+    "after": 539485,
+    "original_size": [
+      2172,
+      724
+    ],
+    "optimized_size": [
+      1080,
+      360
+    ],
+    "sha256": "79229cd0c52f1289ac9a8398754d71555c529d0ab394fef7fe7c239c8067ee21"
+  },
+  {
+    "path": "media/rarities/v2/rare.png",
+    "before": 1608540,
+    "after": 445825,
+    "original_size": [
+      2172,
+      724
+    ],
+    "optimized_size": [
+      1080,
+      360
+    ],
+    "sha256": "d990dcc7b404afd584f86d60bd4fab00fe946c6f442f341fc8c05768fc0ce2ed"
+  },
+  {
+    "path": "media/rarities/v2/super-rare.png",
+    "before": 1809596,
+    "after": 492718,
+    "original_size": [
+      2172,
+      724
+    ],
+    "optimized_size": [
+      1080,
+      360
+    ],
+    "sha256": "fb4a61a9c7101da95f2db2da892df74564fd12821f36722fa63282638e828625"
+  },
+  {
+    "path": "media/ui/lobby/achievements.png",
+    "before": 2202571,
+    "after": 112311,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      256,
+      256
+    ],
+    "sha256": "c25eb94bb6d5ad955d61eec267179ae6c35beee80af8d9ac26eecec09ff45d8c"
+  },
+  {
+    "path": "media/ui/lobby/choose-character.png",
+    "before": 2025094,
+    "after": 105247,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      256,
+      256
+    ],
+    "sha256": "5642cc20b09a9fa14d7e9f4e4a420d9873f50935f5c22b57ce69df918ec08068"
+  },
+  {
+    "path": "media/ui/lobby/codex.png",
+    "before": 2158473,
+    "after": 100726,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      256,
+      256
+    ],
+    "sha256": "2ef7af81be8b278a82d8e70170e333f19c65ad114a294e717e853e6cfcf0d1e6"
+  },
+  {
+    "path": "media/ui/lobby/collection.png",
+    "before": 1746620,
+    "after": 86969,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      256,
+      256
+    ],
+    "sha256": "dd2e0f3efb2737bf634ddd258f1e2e6f1eff3be2e69897a77613eb25f5f2ef5e"
+  },
+  {
+    "path": "media/ui/lobby/daily.png",
+    "before": 1817073,
+    "after": 91720,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      256,
+      256
+    ],
+    "sha256": "cb610d840c7fec32c1c4f4cfcfb808150c9d8856931e239910bd9422a8a7e18d"
+  },
+  {
+    "path": "media/ui/lobby/enter-sanctum.png",
+    "before": 1968885,
+    "after": 98146,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      256,
+      256
+    ],
+    "sha256": "c3671b589f5294820c43f4dccb958cf6a998d0f343bdac79c08461b37585b3f4"
+  },
+  {
+    "path": "media/ui/lobby/history.png",
+    "before": 1568941,
+    "after": 82501,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      256,
+      256
+    ],
+    "sha256": "fa3a5b60f62901f21527ac1577fbab27506a4b064ed853c2924882317b13d577"
+  },
+  {
+    "path": "media/ui/lobby/profile.png",
+    "before": 1595492,
+    "after": 79181,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      256,
+      256
+    ],
+    "sha256": "cce36a8d798a3d29e0c7abab32670784247e70d3d2b1f36ba5b5b8c1f4108464"
+  },
+  {
+    "path": "media/ui/lobby/progression.png",
+    "before": 1761105,
+    "after": 87768,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      256,
+      256
+    ],
+    "sha256": "04800c5d041e933ec0f2ac734cd5b1656887881c6d47e63c5acaf4cfdc7b762e"
+  },
+  {
+    "path": "media/ui/lobby/prompt.png",
+    "before": 1468801,
+    "after": 76727,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      256,
+      256
+    ],
+    "sha256": "b5ee89b11cd1d9d9af056aa25eb8fb53923888e89bae3875fddab90e0be80ad7"
+  },
+  {
+    "path": "media/ui/lobby/settings.png",
+    "before": 2094526,
+    "after": 102516,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      256,
+      256
+    ],
+    "sha256": "12c2675b8b5fc6ade1ea430920240e61a71cf3382a2090a29b7e5c610f8e2cb2"
+  },
+  {
+    "path": "media/ui/lobby/shop.png",
+    "before": 2240702,
+    "after": 107258,
+    "original_size": [
+      1254,
+      1254
+    ],
+    "optimized_size": [
+      256,
+      256
+    ],
+    "sha256": "d03843e8b24a7c6a952027f7205c0d301c5436402b6452a4c0c5fb2f9fffa95d"
+  }
+]
