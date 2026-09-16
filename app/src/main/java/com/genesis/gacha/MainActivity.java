@@ -268,7 +268,68 @@ public final class MainActivity extends Activity {
  }
  private void selectCharacter(){String[] labels=new String[characters.length()];for(int i=0;i<labels.length;i++){JSONObject c=characters.optJSONObject(i);labels[i]=name(c)+" · "+c.optString("characterId");}if(labels.length==0){alert("Summon a character first.");return;}new AlertDialog.Builder(this).setTitle("Choose a character").setItems(labels,(d,i)->{selected=characters.optJSONObject(i).optString("serverRegistryId");render();}).show();}
  private void detail(){heading("Character dossier");JSONObject c=current();if(c==null){heading("Choose a character");button(body,"Back to Lobby",()->gotoPage("Lobby"));return;}LinearLayout saved=body;LinearLayout[] panes=workspacePanels();equipmentPortrait(panes[0],c);body=panes[1];try{button(body,c.optBoolean("favorite")?"Remove favorite":"Favorite",()->mutate("genesis_character_set_favorite",json("p_registry_id",selected,"p_favorite",!c.optBoolean("favorite")),false));button(body,"Rename",()->{EditText e=new EditText(this);e.setSingleLine(true);e.setText(c.optString("customName"));e.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(48)});new AlertDialog.Builder(this).setTitle("Character name").setView(e).setNegativeButton("Cancel",null).setPositiveButton("Save",(d,w)->mutate("genesis_character_set_name",json("p_registry_id",selected,"p_custom_name",e.getText().toString()),false)).show();});for(String k:new String[]{"characterId","seed","raceCategory","gender","age","origin","subclass","faction","affinity","title","ability","ultimate","passive","powerType","magicType","trait","personality","alignment","weapon","weaponCategory","weaponEffect"})note(k.replaceAll("([a-z])([A-Z])","$1 $2")+": "+c.optString(k));text(body,"Character stats",20,gold);try{JSONObject stats=new JSONObject(engine.call("nativeStats",c.toString()));for(String key:new String[]{"STR","AGI","INT","DEF","VIT","LCK"})note(key+": "+stats.optInt(key));}catch(JSONException ignored){}text(body,"Equipment",20,gold);JSONObject eq=obj(c,"equipment");for(String k:new String[]{"armor","accessory","relic","artifact"}){JSONObject e=obj(eq,k);note(k+": "+e.optString("name")+" +"+e.optInt("upgrade")+" · "+obj(e,"rarity").optString("name"));}note(c.optString("lore"));button(body,"Archive character",()->new AlertDialog.Builder(this).setTitle("Archive this character?").setMessage("It will leave your active Collection. This edition has no restore control.").setNegativeButton("Keep",null).setPositiveButton("Archive",(d,w)->{page="Collection";mutate("genesis_character_archive",json("p_registry_id",selected),false);}).show());}finally{body=saved;}}
- private void progression(){heading("Character progression");button(body,"Choose character",this::selectCharacter);JSONObject c=current();if(c==null){note("Choose a Collection character to train or upgrade.");return;}LinearLayout saved=body;LinearLayout[] panes=workspacePanels();equipmentPortrait(panes[0],c);body=panes[1];try{JSONObject p=obj(c,"progression");String[] stages={"Base","Awakened","Ascended","Transcendent"};note(stages[Math.min(3,p.optInt("stage"))]+" · EXP "+p.optInt("xp"));int lv=p.optInt("level",1);note("Next training cost: "+Math.max(12,Math.round(10+lv*2.4))+" Essence");button(body,"Train +1",()->mutate("genesis_character_train",json("p_registry_id",selected,"p_levels",1),true)).setEnabled(lv<100);button(body,"Train ×5",()->mutate("genesis_character_train",json("p_registry_id",selected,"p_levels",5),true)).setEnabled(lv<100);note("Evolution: Awakened Lv25 / 250 Essence; Ascended Lv50 / 600; Transcendent Lv80 / 1200.");button(body,"Advance evolution",()->mutate("genesis_character_ascend",json("p_registry_id",selected),true)).setEnabled(p.optInt("stage")<3);int w=c.optInt("weaponUpgrade");button(body,"Weapon +"+w+" · Upgrade ("+(45+w*35+w*w*4)+" Essence)",()->mutate("genesis_character_upgrade_weapon",json("p_registry_id",selected),true)).setEnabled(w<10);for(String slot:new String[]{"armor","accessory","relic","artifact"}){JSONObject e=obj(obj(c,"equipment"),slot);int level=e.optInt("upgrade"),stars=obj(e,"rarity").optInt("stars",1);long cost=Math.round((30+level*26+level*level*3)*(1+(stars-1)*.08));note(e.optString("name"));button(body,slot+" +"+level+" · Upgrade ("+cost+" Essence)",()->mutate("genesis_character_upgrade_equipment",json("p_registry_id",selected,"p_slot",slot),true)).setEnabled(level<10);}}finally{body=saved;}}
+ // UI estimates mirror V16.3B RPCs. The server remains authoritative.
+ private static int progressionXpNeeded(int level){return level>=100?0:70+level*18+(level*level*3)/5;}
+ private static long progressionTrainCost(int level){return level>=100?0:Math.max(12,Math.round(10+level*2.4));}
+ private static long progressionUpgradeCost(int level,int stars,boolean weapon){
+  if(level>=10)return 0;
+  return weapon?45+level*35+level*level*4:Math.round((30+level*26+level*level*3)*(1+(Math.max(1,Math.min(10,stars))-1)*.08));
+ }
+ // Returns affordable training steps, cost, and resulting level; includes carried EXP.
+ private static long[] progressionTrainingQuote(int level,long xp,int requested,long essence){
+  int steps=0;long cost=0;
+  for(int i=0;i<Math.max(1,Math.min(5,requested))&&level<100;i++){
+   long next=progressionTrainCost(level);if(next>essence-cost)break;
+   cost+=next;steps++;xp+=progressionXpNeeded(level);
+   while(level<100&&xp>=progressionXpNeeded(level)){xp-=progressionXpNeeded(level);level++;}
+  }
+  return new long[]{steps,cost,level};
+ }
+ private static int progressionEvolutionLevel(int stage){return stage==1?25:stage==2?50:stage==3?80:1;}
+ private static long progressionEvolutionCost(int stage){return stage==1?250:stage==2?600:stage==3?1200:0;}
+ private void progressionAction(String label,long cost,long essence,boolean available,Runnable action){
+  Button control=button(body,label+(available&&essence<cost?" · Need "+(cost-essence)+" more Essence":""),action);
+  boolean enabled=available&&essence>=cost;control.setEnabled(enabled);control.setAlpha(enabled?1f:.55f);
+ }
+ private void progression(){
+  heading("Character progression");button(body,"Choose character",this::selectCharacter);
+  JSONObject c=current();if(c==null){note("Choose a Collection character to train or upgrade.");return;}
+  LinearLayout saved=body;LinearLayout[] panes=workspacePanels();equipmentPortrait(panes[0],c);body=panes[1];
+  try{
+   JSONObject p=obj(c,"progression");String[] stages={"Base","Awakened","Ascended","Transcendent"};
+   int stage=Math.max(0,Math.min(3,p.optInt("stage"))),lv=Math.max(1,Math.min(100,p.optInt("level",1)));
+   long essence=obj(economy,"wallet").optLong("essence"),xp=Math.max(0,p.optLong("xp"));
+   note("Level "+lv+" / 100 · "+stages[stage]+" · "+essence+" Essence");
+   note(lv>=100?"Maximum character level reached.":"EXP "+xp+" / "+progressionXpNeeded(lv));
+   note("Costs below use your latest balance. The server confirms the final result.");
+   final String registry=c.optString("serverRegistryId");
+   for(int requested:new int[]{1,5}){
+    long[] quote=progressionTrainingQuote(lv,xp,requested,essence);
+    String label=lv>=100?"Train · Max level":quote[0]==0?"Train · "+progressionTrainCost(lv)+" Essence":
+     "Train ×"+quote[0]+" · "+quote[1]+" Essence · Lv"+quote[2];
+    if(requested==5&&lv<100)label+=" (up to 5)";
+    // Send the quoted step count, so a fresher server balance cannot increase this batch.
+    final int steps=(int)quote[0];
+    progressionAction(label,steps>0?quote[1]:progressionTrainCost(lv),essence,lv<100,
+     ()->mutate("genesis_character_train",json("p_registry_id",registry,"p_levels",steps),true));
+   }
+   int next=stage+1,required=progressionEvolutionLevel(next);long evolutionCost=progressionEvolutionCost(next);
+   String evolution=stage>=3?"Evolution · Max stage":stages[next]+" · Lv"+required+" · "+evolutionCost+" Essence";
+   if(stage<3&&lv<required)evolution+=" · Requires Lv"+required;
+   progressionAction(evolution,evolutionCost,essence,stage<3&&lv>=required,
+    ()->mutate("genesis_character_ascend",json("p_registry_id",registry),true));
+   int w=Math.max(0,Math.min(10,c.optInt("weaponUpgrade")));long weaponCost=progressionUpgradeCost(w,1,true);
+   progressionAction("Weapon +"+w+(w>=10?" · Max upgrade":" → +"+(w+1)+" · "+weaponCost+" Essence"),weaponCost,essence,w<10,
+    ()->mutate("genesis_character_upgrade_weapon",json("p_registry_id",registry),true));
+   for(String slot:new String[]{"armor","accessory","relic","artifact"}){
+    JSONObject e=obj(obj(c,"equipment"),slot);int level=Math.max(0,Math.min(10,e.optInt("upgrade")));
+    // stars is the internal power band, NOT the visible displayStars value.
+    long cost=progressionUpgradeCost(level,obj(e,"rarity").optInt("stars",1),false);note(e.optString("name"));
+    progressionAction(slot+" +"+level+(level>=10?" · Max upgrade":" → +"+(level+1)+" · "+cost+" Essence"),cost,essence,level<10,
+     ()->mutate("genesis_character_upgrade_equipment",json("p_registry_id",registry,"p_slot",slot),true));
+   }
+  }finally{body=saved;}
+ }
  /** Central character visual entry point until modular sprites are ready. */
  private void thumbnail(LinearLayout box,JSONObject character,int height){
   String race=character.optString("baseRace","").trim();if(race.isEmpty())race=character.optString("race","unknown").trim();if(race.isEmpty())race="unknown";
