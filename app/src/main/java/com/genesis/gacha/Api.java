@@ -69,12 +69,26 @@ final class Api {
                     text = out.toString("UTF-8");
                 }
             }
-            JSONObject result;
-            try { result = text.trim().startsWith("{") ? new JSONObject(text) : text.trim().startsWith("[") ? new JSONObject().put("items",new org.json.JSONArray(text)) : new JSONObject(); }
-            catch(Exception ignored) { result = new JSONObject(); }
-            if(code < 200 || code >= 300) throw new ApiError(code, result.optString("msg", result.optString("message", result.optString("error_description", "Request failed ("+code+"). Please try again."))));
-            return result;
+            return decodeResponse(code,text,path.equals("/auth/v1/logout"));
         } finally { c.disconnect(); }
+    }
+    // Invalid 2xx bodies are an uncertain outcome, never a confirmed mutation.
+    static JSONObject decodeResponse(int code,String text,boolean logout) throws Exception {
+        JSONObject result = null;
+        try {
+            org.json.JSONTokener parser = new org.json.JSONTokener(text);
+            Object value = parser.nextValue();
+            if(parser.nextClean() != 0) throw new org.json.JSONException("Trailing response data");
+            if(value instanceof JSONObject) result = (JSONObject)value;
+            else if(value instanceof org.json.JSONArray) result = new JSONObject().put("items",value);
+        } catch(org.json.JSONException ignored) { }
+        if(code < 200 || code >= 300) {
+            if(result == null) result = new JSONObject();
+            throw new ApiError(code,result.optString("msg",result.optString("message",result.optString("error_description","Request failed ("+code+"). Please try again."))));
+        }
+        if(result != null) return result;
+        if(logout && code == 204 && text.trim().isEmpty()) return new JSONObject();
+        throw new java.io.IOException("The server response was incomplete or invalid. Reload your account to confirm the result.");
     }
     static final class ApiError extends Exception {
         final int status;
